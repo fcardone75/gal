@@ -1,0 +1,3 @@
+[submodule "vendor/bni/gpec"]
+	path = vendor/bni/gpec
+	url = https://github.com/fcardone75/gpec_client.git
