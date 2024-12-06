@@ -1,0 +1,84 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pgadmin
+  namespace: databases
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgadmin
+  template:
+    metadata:
+      labels:
+        app: pgadmin
+    spec:
+      initContainers:
+        - name: init-permissions
+          image: busybox
+          command: ["sh", "-c", "chown -R 5050:0 /var/lib/pgadmin && chmod -R 775 /var/lib/pgadmin"]
+          volumeMounts:
+          - name: pgadmin-volume
+            mountPath: /var/lib/pgadmin
+      containers:
+      - name: pgadmin
+        image: dpage/pgadmin4
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "40"  
+        ports:
+        - containerPort: 80
+        env:
+        - name: PGADMIN_DEFAULT_EMAIL
+          value: "email@example.com"
+        - name: PGADMIN_DEFAULT_PASSWORD
+          value: "examplepassword"
+        volumeMounts:
+        - name: pgadmin-volume
+          mountPath: /var/lib/pgadmin
+      volumes:
+      - name: pgadmin-volume
+        persistentVolumeClaim:
+          claimName: pgadmin-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: pgadmin
+  namespace: databases
+spec:
+  selector:
+    app: pgadmin
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP         
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pgadmin-ingress
+  namespace: databases
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: pgadmin.local
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: pgadmin
+            port:
+              number: 80
+
+          

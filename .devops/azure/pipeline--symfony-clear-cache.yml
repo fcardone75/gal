@@ -1,0 +1,17 @@
+trigger:
+  'none'
+
+pool:
+  'ArtigiancassaAWSPool'
+
+steps:
+  - task: SystemsManagerRunCommand@1
+    inputs:
+      awsCredentials: 'aws-artcas-deploy-staging'
+      regionName: 'eu-central-1'
+      documentName: 'AWS-RunShellScript'
+      documentParameters: '{"workingDirectory":["/var/app/current"],"executionTimeout":["3600"],"commands":["sudo -u webapp php bin/console cache:clear"]}'
+      instanceSelector: 'fromTags'
+      instanceTags: 'environment=staging'
+      cloudWatchOutputEnabled: true
+      cloudWatchLogGroupName: '/ssm/ec2/liguria/commands'

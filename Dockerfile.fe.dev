@@ -1,0 +1,4 @@
+FROM wodby/nginx:1.21-5.17.4
+
+
+EXPOSE  80

@@ -1,0 +1,23 @@
+# config/services_test.yaml
+services:
+  # In-Memory User Provider for Testing Purposes
+  security.user.provider.concrete.in_memory:
+    class: Symfony\Component\Security\Core\User\InMemoryUserProvider
+    arguments:
+      - { 'test_user': { password: 'encoded_test_password', roles: ['ROLE_USER'] } }
+
+  # Define the alias for Password Hasher Factory Interface
+  Symfony\Component\PasswordHasher\Hasher\PasswordHasherFactoryInterface:
+    alias: 'security.password_hasher_factory'
+
+  Symfony\Component\Security\Core\User\UserProviderInterface:
+    alias: 'security.user.provider.concrete.in_memory'
+
+  Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface:
+    alias: Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher
+
+  Symfony\Component\PasswordHasher\Hasher\UserPasswordHasher:
+    arguments:
+      - '@security.password_hasher_factory'
+      - '@security.user.provider.concrete.in_memory'
+    public: true

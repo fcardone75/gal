@@ -1,0 +1,5 @@
+application_group:
+    not_found: 'La Domanda con ID {id} non è stata trovata'
+application:
+    not_found: 'La Pratica con ID {id} non è stata trovata'
+    not_linkable: 'La Pratica con ID {id} non può essere associata alla Domanda'

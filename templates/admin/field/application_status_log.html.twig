@@ -1,0 +1,27 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{% if ea.crud.currentAction == 'detail' %}
+    {% for item in field.value %}
+        <div class="status-box">
+            <div class="box-header">
+                <div class="status">
+                    {{ item.status|trans([], 'application_status') }}
+                    {% if item.description %}
+                        <span class="description">- {{ item.description }}</span>
+                    {% endif %}
+                </div>
+                <div class="date">{{ item.createdAt|date('d/m/Y H:i:s') }}</div>
+            </div>
+{#            {% if item.description %}#}
+{#            <div class="box-content">#}
+{#                <div class="description">#}
+{#                    {{ item.description }}#}
+{#                </div>#}
+{#            </div>#}
+{#            {% endif %}#}
+        </div>
+    {% endfor %}
+{% else %}
+    {{ field.formattedValue }}
+{% endif %}

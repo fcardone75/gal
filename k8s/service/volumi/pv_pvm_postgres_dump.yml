@@ -1,0 +1,39 @@
+---
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-dump-pvc
+  namespace: databases
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: ""
+  selector:
+    matchLabels:
+      type: local  
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: postgres-dump-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/Users/fcardone/Work/artigiancassa/prod/gal/k8s/pv/postgres/dump"  # Cambia questo percorso con il percorso reale sul tuo host
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: ""
+  claimRef:
+    kind: PersistentVolumeClaim
+    namespace: databases
+    name: postgres-dump-pvc
+    apiVersion: v1
+
+

@@ -1,0 +1,10 @@
+{% extends 'mail/base.txt.twig' %}
+
+{% block body %}
+    Gentile utente,è stata creata una nuova utenza su {{ url('admin') }}.
+    Ecco le tue credenziali di accesso:
+    Username: {{ user.username }}
+    Password: {{ user.plainPassword }}
+
+    Grazie<br/>
+{% endblock body %}

@@ -1,0 +1,91 @@
+user_password: "La password inserita non è corretta"
+password_already_used: "La password inserita è già stata utilizzata in passato, si prega di inserirne una nuova"
+password_mismatch: "Le password non coincidono"
+secure_password: "La password non deve contenere riferimenti al nome utente"
+change_password_frequency: "La password è stata cambiata da meno di {allowed_frequency}"
+password_regex: "La password deve avere una lunghezza minima di 8 caratteri, contenere almeno una lettera minuscola, una maiuscola, un numero e un carattere speciale"
+practice_id_regex: "Il Codice pratica può contenere solo caratteri alfanumerici"
+
+#text_field_regex: "Il campo può contenere solo caratteri, lettere accentate, spazi ( ), e apice (')"
+text_field_regex: "Il campo può contenere solo caratteri alfanumerici, lettere accentate, e i seguenti caratteri speciali: \" ,'.-&\""
+
+file_p7m_not_signed: "Il file non è firmato"
+file_p7m_mime_type: "Il file caricato non é un .p7m o .pdf"
+
+consistent_practice_id: 'Il numero di pratica inserito ("{practice_id}") dovrebbe essere presente in uno e uno solo degli altri fogli, invece è stato trovato in altri {count} fogli'
+
+
+application_import:
+    invalid_date_format: 'La data {value} non è in un formato valido'
+    invalid_yesno: 'Il valore {value} non è valido (valori possibili "S" o "N")'
+    invalid_float: 'Il valore {value} è in un formato non corretto (formati accettati: 12 | 12,3 | 12,34)'
+    invalid_rate_type: 'Il valore {value} non è valido (valori possibili "V" o "F")'
+
+assurance_enterprise_import:
+    g_assurance_amount: 'Questo valore dovrebbe essere un numero con la virgola'
+    ac_application_members_valid: 'Non è possibile specificare un Numero di Soci Partecipanti alla Domanda se non c''è Richiesta di Contributo Interessi/Canoni e se non si tratta di società cooperativa'
+    lost_fund_contribution_request: 'La Richiesta Contributo Fondo Perduto può essere avanzata solo se viene fatta Richiesta di Contributo Interessi/Canoni'
+    contribution_application_amount: 'L''importo Domanda di Contributo può essere specificato solo se viene fatta Richiesta Contributo Interessi/Canoni'
+    unique_practice_id: 'Sono presenti nel foglio "Domanda-Impresa" due pratiche con lo stesso identificativo "{value}"'
+    ib_iban: 'In caso di Richiesta Contributo Interessi/Canoni è necessario indicare l''IBAN'
+    ib_aia_code: 'Il valore {value} non rispetta il formato PPnnnnnnn (provincia + numero di 7 cifre)'
+    fiscal_code: 'Il dato inserito non è né un codice fiscale né un numero di partita IVA'
+    birth_place_conflict: 'Deve essere specificato alternativamente il comune oppure lo stato estero di nascita'
+    members_valid:
+        birth_date: 'La data {value} non è in un formato valido'
+    invalid_chamber_of_commerce_code: 'Il valore {value} non rispetta il formato PPnnnnnnn (provincia + numero di 8 cifre)'
+    workplace_address_empty_or_null: 'L''Indirizzo Sede Operativa non può essere vuoto se vengono specificati un CAP e/o un Comune Sede Operativa'
+    workplace_city_empty_or_null: 'Il Comune Sede Operativa non può essere vuoto se vengono specificati un CAP e/o un Indirizzo Sede Operativa'
+    workplace_postcode_empty_or_null: 'Il CAP Sede Operativa non può essere vuoto se vengono specificati un Indirizzo e/o un Comune Sede Operativa'
+financing_import:
+    other_bank_information_valid:
+        business_name: 'Se nella colonna "B" è selezionato "{keyword}" è necessario specificare il Codice Fiscale/Ragione Sociale'
+        abi: 'Se nella colonna "B" è selezionato "ALTRO" è necessario specificare il codice ABI'
+        abi_invalid: 'Il codice ABI non è valido (dovrebbe essere 5 cifre)'
+
+leasing_import:
+    other_bank_information_valid:
+        business_name_invalid: 'Se nella colonna "B" è selezionato "{keyword}" è necessario specificare il Codice Fiscale/Ragione Sociale'
+
+company_size_invalid: 'Il valore inserito non è valido'
+legal_form_invalid: 'Il valore inserito non è valido'
+city_invalid: 'Il valore inserito non è valido'
+country_invalid: 'Il valore inserito non è valido'
+bank_invalid: 'Il valore inserito non è valido'
+financial_destination_invalid: 'Il valore inserito non è valido'
+periodicity_invalid: 'Il valore inserito non è valido'
+bank_leasing_invalid: 'Il valore inserito non è valido'
+leasing_destination_invalid: 'Il valore inserito non è valido'
+ateco_code_invalid: 'Il codice ATECO inserito "{code}" non è valido'
+available_practice_id_invalid: 'Il codice pratica "{practiceId}" risulta già in uso da una pratica precedentemente acquisita'
+fiscal_code:
+    deep_check_invalid: 'Il codice fiscale inserito non è valido'
+valid_assurance_amount:
+    invalid: 'L''Importo Garanzia Confidi deve essere minore o uguale all''importo del finanziamento/leasing'
+office_workplace_city_in_region:
+    workplace_city_not_in_region: 'La sede operativa deve essere in un comune della Liguria'
+
+template_unique_revision: 'Esiste già un template con numero di revisione "{revision_number}". Si prega di modificare il valore nella cella "{revision_cell}" del file excel'
+valid_import_spreadsheet:
+    spreadsheet_invalid: 'Il file caricato non è di un formato accettabile.'
+    revision_invalid: 'Il numero di versione del file caricato "{revision_number}" non è valido. Si prega di controllare la cella "{revision_cell}" del foglio "{references_sheet}"'
+    sheet_count_mismatch: 'Il numero di fogli del file caricato ({actual}) non è quello atteso ({expected})'
+    missing_sheet: 'Nel file caricato non è presente il foglio "{sheet_name}"'
+    no_references_sheet: 'Il file caricato non contiene un foglio "{references_sheet}"'
+    no_revision: 'Il file caricato non ha un numero di versione. Si prega di controllare la cella "{revision_cell}" del foglio "{references_sheet}"'
+    revision_not_found: 'Il numero di versione "{revision_number}" del file caricato non è valido. Si prega di controllare la cella "{revision_cell}" del foglio "{references_sheet}"'
+
+allow_protocol_not_allowed: 'Non è possibile avere contemporaneamente due Domande in stato "Protocollata". Per il Confidi "{confidi}" è già presente la domanda con numero di protocollo "{protocol_number}"'
+
+change_password_frequency_days: >-
+    {count, plural,
+        =0 {0 giorni}
+        one {un giorno}
+        other {# giorni}
+    }
+change_password_frequency_hours: >-
+    {count, plural
+        =0 {0 ore}
+        one {un'ora}
+        other {# ore}
+    }

@@ -1,0 +1,31 @@
+{
+	"name": "ArtigianCassa GAL",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/php:1-8.2-bullseye",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Configure tool-specific properties.
+	// "customizations": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [
+		8080
+	],
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": true,
+			"azureDnsAutoDetection": true,
+			"installDockerBuildx": true,
+			"installDockerComposeSwitch": true,
+			"version": "latest",
+			"dockerDashComposeVersion": "latest"
+		},
+		"ghcr.io/schlich/devcontainer-features/powerlevel10k:1": {}
+	},
+
+	 "postCreateCommand": "curl -sS https://get.symfony.com/cli/installer | bash && export PATH=\"$HOME/.symfony5/bin:$PATH\" && apt-get update && apt-get install -y libzip-dev zip unzip git curl libicu-dev libonig-dev libxml2-dev libpq-dev libgd-dev libxml2-dev libxslt-dev && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath opcache intl zip pdo_pgsql pgsql gd fileinfo soap xsl && git config --global --add safe.directory ${containerWorkspaceFolder}",
+
+	"remoteUser": "root"
+}

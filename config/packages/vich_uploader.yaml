@@ -1,0 +1,35 @@
+vich_uploader:
+    db_driver: orm
+    storage: gaufrette
+    metadata:
+        type: annotation #attribute
+
+    mappings:
+        application_import_template:
+            uri_prefix: /application_import_templates
+            upload_destination: application_import_template
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        application_import:
+            uri_prefix: /application_import
+            upload_destination: application_import
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        report_import:
+            uri_prefix: /report_import
+            upload_destination: report_import
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        application_message_attachment:
+            uri_prefix: /application_message_attachment
+            upload_destination: application_message_attachment
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        application_group:
+            uri_prefix: /application_group
+            upload_destination: application_group
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        application_attachment:
+            uri_prefix: /application_attachment
+            upload_destination: application_attachment
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+        financing_provisioning:
+            uri_prefix: /financing_provisioning
+            upload_destination: financing_provisioning
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer

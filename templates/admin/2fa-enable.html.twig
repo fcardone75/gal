@@ -1,0 +1,80 @@
+{% extends '@EasyAdmin/page/login.html.twig' %}
+
+{% block head_favicon %}
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/2fa_info.js') }}"> </script>
+{% endblock head_javascript %}
+
+{% block wrapper_wrapper %}
+<div class="mfa-wrapper">
+
+    <section class="content text-center">
+        <h1 class="text-center">Enable 2FA</h1>
+        <h4 class="text-center">Two factor authentication is mandatory to access this system.</h4>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-info btn-lg btn-block" id="app-2fa-button-info">Info</button>
+        </div>
+
+        <div class="modal fade" id="app2faModalInfo" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h4>Enable 2FA</h4>
+                        <p>Questo sito richiede un'autenticazione a 2 fattori.</p>
+
+                        <p class="text-left">Per proseguire:</p>
+                        <ul class="text-left">
+                            <li>verifica di aver installato sul tuo smartphone una delle app di autenticazioni supportate</li>
+                            <li>apri l'app di autenticazione e scansiona il QRcode</li>
+                            <li>ti apparirà una nuova riga</li>
+                            <li>inserisci nel box qui il codice che ti mostrerà l'app</li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <img src="{{ qr_code_data_uri(qrCodeContent) }}" />
+        <form method="post" action="/admin/2fa_verify">
+            {% if csrf_token_intention|default(false) %}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token(csrf_token_intention) }}">
+            {% endif %}
+            <input type="hidden" name="secret" value="{{ secret }}">
+            <div class="form-group">
+                <label class="form-control-label required" for="code">Insert the authenticator code:</label>
+                <div class="form-widget">
+                    <input
+                        id="_auth_code"
+                        type="text"
+                        name="_auth_code"
+                        autocomplete="one-time-code"
+                        autofocus
+                                />
+                </div>
+            </div>
+            {% if error|default(false) %}
+                <div class="w-100 alert alert-danger rounded mb-3">
+                    <i class="fas fa-times-circle mr-1"></i>
+                    {{ error }}
+                </div>
+            {% endif %}
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Confirm</button>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

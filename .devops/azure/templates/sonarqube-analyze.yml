@@ -1,0 +1,16 @@
+steps:
+# Prepare Analysis Configuration task
+- task: SonarQubePrepare@6
+  inputs:
+    SonarQube: 'sonarqube-bancaagevolarti-aws'
+    scannerMode: 'CLI'
+    configMode: 'manual'
+    cliProjectKey: '$(SONARQUBE_KEY)'
+
+# Run Code Analysis task
+- task: SonarQubeAnalyze@6
+
+# Publish Quality Gate Result task
+- task: SonarQubePublish@6
+  inputs:
+    pollingTimeoutSec: '300'

@@ -1,0 +1,62 @@
+sheet:
+    name: 'Riferimenti'
+    revision_cell: 'B2'
+entities:
+    App\Entity\Bank:
+        row_start: 4
+        map:
+            name: 'Q'
+            code: 'R'
+    App\Entity\BankLeasing:
+        row_start: 4
+        map:
+            name: 'Z'
+            code: 'AA'
+    App\Entity\City:
+        row_start: 4
+        map:
+            name: 'H'
+            code: 'I'
+    App\Entity\CityLiguria:
+        alias_of: 'App\Entity\City'
+        row_start: 4
+        map:
+            name:
+                column: 'K'
+                calls:
+                    setInRegion: [true]
+            code: 'L'
+    App\Entity\CompanySize:
+        row_start: 4
+        map:
+            size: 'A'
+            code: 'B'
+    App\Entity\Country:
+        row_start: 4
+        map:
+            name: 'N'
+            code: 'O'
+    App\Entity\FinancialDestination:
+        row_start: 4
+        map:
+            destination: 'T'
+            code: 'U'
+    App\Entity\LeasingDestination:
+        row_start: 4
+        map:
+            code: 'AD'
+            destination: 'AC'
+    App\Entity\LegalForm:
+        row_start: 4
+        map:
+            name: 'D'
+            referenceId: 'E'
+            cooperative:
+                column: 'F'
+                type: 'boolean'
+    App\Entity\Periodicity:
+        row_start: 4
+        map:
+            type: 'W'
+            months: 'X'
+

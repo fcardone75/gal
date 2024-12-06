@@ -1,0 +1,9 @@
+vendor
+composer.lock
+composer.phar
+phpunit.xml
+wsdltophp.yml
+bin
+tests/resources/generated
+coverage
+.phpunit.result.cache

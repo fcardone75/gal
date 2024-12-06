@@ -1,0 +1,54 @@
+{% extends '@EasyAdmin/crud/edit.html.twig' %}
+
+{% block main %}
+    {{  parent() }}
+
+    <div class="content-panel">
+        <div class="content-panel-header">
+            <h5>{{ 'crud.application_group.applications_grid.linked.title'|trans }}</h5>
+        </div>
+        <div class="content-panel-body with-background with-header with-footer">
+            <!-- print associated applications -->
+            {% include '@EasyAdmin/application-group/crud/applications_table.html.twig' with { applications: entity.instance.applications, type: 'linked' } %}
+        </div>
+    </div>
+
+    {% if entity.instance.status == constant('App\\Entity\\ApplicationGroup::STATUS_NEW') %}
+    <div class="content-panel">
+        <div class="content-panel-header">
+            <h5>{{ 'crud.application_group.applications_grid.available.title'|trans }}</h5>
+        </div>
+        <div class="content-panel-body with-background with-header with-footer">
+            <!-- print linkable applications -->
+            {% include '@EasyAdmin/application-group/crud/applications_table.html.twig' with { applications: unlinkedApplications, type: 'available' } %}
+        </div>
+    </div>
+    {% endif %}
+
+    <div id="modal-protocol" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <h4>{{ 'crud.application_group.modal_protocol.title'|trans }}</h4>
+                    <p>{{ 'crud.application_group.modal_protocol.content'|trans|raw }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-secondary">
+                        <span class="btn-label">{{ 'crud.application_group.modal_protocol.actions.cancel'|trans }}</span>
+                    </button>
+
+                    <button type="submit" data-bs-dismiss="modal" class="btn btn-primary" id="modal-protocol-button" form="edit-ApplicationGroup-form" name="ea[newForm][btn]">
+                        <span class="btn-label">{{ 'crud.application_group.modal_protocol.actions.confirm'|trans }}</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock main %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script type="application/javascript" src="{{ asset('js/application_group_edit.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/vich_file_widget.js') }}"> </script>
+{% endblock body_javascript %}

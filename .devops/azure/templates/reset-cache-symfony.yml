@@ -1,0 +1,21 @@
+jobs:
+  - job: ProcessResetCache
+    pool: 'ArtigiancassaAWSPool'
+    displayName: 'Process Reset Cache'
+    steps:
+      - task: SystemsManagerRunCommand@1
+        inputs:
+          awsCredentials: '$(AWS_CREDENTIAL)'
+          regionName: '$(AWS_DEFAULT_REGION)'
+          documentName: 'AWS-RunShellScript'
+          documentParameters: '{"workingDirectory":["/var/app/current"],"executionTimeout":["3600"],"commands":["sudo -u webapp php bin/console cache:clear"]}'
+          instanceSelector: 'fromTags'
+          instanceTags: |
+            apps-group=liguria
+            app-id=gal
+            environment=$(AWS_TAG_ENVIRONMENT)
+          maxConcurrency: '1'
+          maxErrors: '1'
+          outputS3BucketName: 'liguria-nsia-log-ssm-command'
+          outputS3KeyPrefix: 'gal-$(AWS_TAG_ENVIRONMENT)'
+

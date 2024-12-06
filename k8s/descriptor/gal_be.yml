@@ -1,0 +1,135 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gal-be
+  namespace: artigiancassa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gal-be
+  template:
+    metadata:
+      labels:
+        app: gal-be
+    spec:
+
+      containers:
+      - name: gal-be
+        image: io.iad2.cloud/artigiancassa/gal-be:0.0.39
+        
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "40"  
+        ports:
+          - containerPort: 9000
+        envFrom:
+        - configMapRef:
+            name: gal-be-config
+        volumeMounts:
+        - mountPath: /var/www/html/var
+          name: temp-volume-be
+      volumes:
+      - name: temp-volume-be
+        emptyDir:
+          medium: Memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gal-be
+  namespace: artigiancassa
+spec:
+  selector:
+    app: gal-be
+  ports:
+    - protocol: TCP
+      port: 9000
+      targetPort: 9000
+  type: ClusterIP         
+---
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: gal-be-config
+     namespace: artigiancassa
+   data:
+      PHP_FPM_CLEAR_ENV: "no"
+      PROJECT_NAME: gal
+      PROJECT_BASE_URL: gal.appdev
+      PHP_IDE_CONFIG: serverName=gal.appdev      
+      APP_ENV: PROD
+      APP_DEBUG: "0"
+      PHP_SMTP: mailhog.databases.svc.cluster.local
+      PHP_SMTP_PORT: "1025"
+      DB_HOST: postgresql.databases.svc.cluster.local
+      DB_USER: galUsr
+      DB_PASSWORD: galPwd
+      DB_NAME: gal
+      DB_PORT: "5432"
+      DB_DRIVER: "postgresql"
+      DB_SERVER_VERSION: "12.5"
+      DATABASE_URL: postgresql://galUsr:galPwd@postgresql.databases.svc.cluster.local:5432/gal?serverVersion=12.5
+      PHP_FPM_USER: wodby
+      PHP_FPM_GROUP: wodby
+      PHP_XDEBUG: "0"
+      PHP_XDEBUG_MODE: debug
+      PHP_OPCACHE_ENABLE: "0"
+      AWS_S3_URL: http://minio.databases.svc.cluster.local:9000
+      AWS_S3_BUCKET: gal
+      AWS_S3_ENDPOINT: http://minio.databases.svc.cluster.local:9000
+      AWS_S3_USE_PATH_STYLE_ENDPOINT: "true"
+      AWS_S3_REGION: "eu-west"
+      AWS_S3_KEY: "AKIAIOSFODNN7EXAMPLE"
+      AWS_S3_SECRET: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+      MAILER_DSN: smtp://mailhog.databases.svc.cluster.local:1025
+      MAILER_DSN_PEC: smtp://another-smtp-server:2555
+      APP_SECURITY_RESET_PASSWORD_MIN_INTERVAL: "172800"
+      APP_MAILER_DEFAULT_SENDER: noreply@garanziaartigianatoliguria.it
+      FILESYSTEM_DRIVER: s3
+      FILESYSTEM_PUBLIC_DRIVER: s3
+      FORWARD_MINIO_PORT: "9000"
+      FORWARD_MINIO_CONSOLE_PORT: "9001"
+      NSIA_SFTP_ENABLED: "false"
+      NSIA_SFTP_HOST: ""
+      NSIA_SFTP_USERNAME: ""
+      NSIA_SFTP_PASSWORD: ""
+      NSIA_SFTP_ENVIRONMENT: dev
+      NSIA_ERROR_MAIL_TO: youremail@example.com
+      NSIA_ERROR_MAIL_BCC: youremail@example.com
+      APP_MAILER_SENDER_PEC: "noreply-pec@garanziaartigianatoliguria.it"
+      FINANCING_PROVISIONING_CERTIFICATION_MAIL_TO: "comunicazioni@pec.garanziaartigianatoliguria.it"
+      GAUFRETTE_ADAPTER_APPLICATION_IMPORT_TEMPLATE_LOCAL_DIR: "/var/upload/application_import_template"
+      GAUFRETTE_ADAPTER_APPLICATION_IMPORT_LOCAL_DIR: "/var/upload/application_import"
+      GAUFRETTE_ADAPTER_REPORT_IMPORT_LOCAL_DIR: "/var/upload/report_import"
+      GAUFRETTE_ADAPTER_APPLICATION_NSIA_XML_LOCAL_DIR: "/var/nsia/application_xml"
+      GAUFRETTE_ADAPTER_APPLICATION_NSIA_LOG_LOCAL_DIR: "/var/nsia/application_log"
+      GAUFRETTE_ADAPTER_APPLICATION_MESSAGE_ATTACHMENT_LOCAL_DIR: "/var/upload/application_message_attachment"
+      GAUFRETTE_ADAPTER_APPLICATION_GROUP_LOCAL_DIR: "/var/upload/application_group"
+      GAUFRETTE_ADAPTER_APPLICATION_ATTACHMENT_LOCAL_DIR: "/var/upload/application_attachment"
+      GAUFRETTE_ADAPTER_FINANCING_PROVISIONING_LOCAL_DIR: "/var/upload/financing_provisioning"
+      MFA_SERVER_NAME: ""
+      MFA_ENABLED: "0"
+      MESSENGER_TRANSPORT_DSN: doctrine://default?auto_setup=1
+      BNI_GPEC_SUBJECT_ENCODING: UTF8
+      BNI_GPEC_BODY_ENCODING: UTF8
+      BNI_GPEC_HEADERS_ENCODING: UTF8
+      BNI_GPEC_RSM_CALLER: AppTestCardone
+      BNI_GPEC_RSM_HOST_ALIAS: smarcheservicescoll.bnl.echonet
+      BNI_GPEC_WSDL_ENDPOINT: http://172.26.0.1:8088/mockGPEC_WrapperSoap?WSDL
+      BNI_GPEC_WSDL_LOCATION: http://172.26.0.1:8088/mockGPEC_WrapperSoap?WSDL
+      BNI_GPEC_PRIORITY: Normal
+      BNI_GPEC_APPLICATION_ID: "1234"
+      BNI_GPEC_USER_ID: "1"
+      BNI_GPEC_IS_BODY_HTML: "false"
+      BNI_GPEC_TESTING_INDEX: "true"
+      BNI_GPEC_USER: test
+      BNI_GPEC_PASSWORD: test
+      GPEC_ENV_UP_FOLDER: "5"
+      

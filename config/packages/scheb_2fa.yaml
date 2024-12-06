@@ -1,0 +1,12 @@
+# config/packages/scheb_two_factor.yaml
+scheb_two_factor:
+  google:
+    enabled: '%env(MFA_ENABLED)%'
+    server_name: 'default_server_name'
+    issuer: 'Garanzia Artigianato Liguria'
+    digits: 6
+    leeway: 5
+    template: admin/2fa-verify.html.twig
+  security_tokens:
+    - Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken
+    - Symfony\Component\Security\Http\Authenticator\Token\PostAuthenticationToken

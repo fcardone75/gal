@@ -1,0 +1,84 @@
+{% extends '@EasyAdmin/page/login.html.twig' %}
+
+{% block head_favicon %}
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+{% endblock %}
+
+{% block head_stylesheets %}
+    {{ parent() }}
+    {{ encore_entry_link_tags('app') }}
+{% endblock %}
+
+{% block head_javascript %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/2fa_info.js') }}"> </script>
+{% endblock head_javascript %}
+
+{% block wrapper_wrapper %}
+<div class="mfa-wrapper">
+
+    <section class="content text-center">
+        <h1 class="text-center">2FA Verification</h1>
+
+        <div class="form-group">
+            <button type="button" class="btn btn-info btn-lg btn-block" id="app-2fa-button-info">Info</button>
+        </div>
+
+        <div class="modal fade" id="app2faModalInfo" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h4>2FA Verification</h4>
+                        <p>Questo sito richiede un'autenticazione a 2 fattori.</p>
+                        <p class="text-left">Per proseguire:</p>
+                        <ul class="text-left">
+                            <li>apri l'app di autenticazione</li>
+                            <li>seleziona la riga corrispondente al portale [Garanzia Artigianato Liguria]</li>
+                            <li>inserisci nel box il codice che ti mostrerà l'app</li>
+                        </ul>
+                        <p class="text-left">
+                            Se hai per qualche motivo hai disinstallato o perso l'accesso all'app di autenticazione a 2 fattori
+                            contatta il team di supporto per chiedere il reset della tua utenza e poter procedere ad una nuova installazione.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Chiudi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form method="post" action="/2fa_check">
+            {% if csrf_token_intention|default(false) %}
+                <input type="hidden" name="_csrf_token" value="{{ csrf_token(csrf_token_intention) }}">
+            {% endif %}
+
+            <div class="form-group">
+                <label class="form-control-label required" for="code">Insert the authenticator code:</label>
+                <div class="form-widget">
+                    <input
+                        id="_auth_code"
+                        type="text"
+                        name="_auth_code"
+                        autocomplete="one-time-code"
+                        autofocus
+                    />
+                </div>
+            </div>
+
+            {# Authentication errors #}
+            {% if authenticationError %}
+                <div class="w-100 alert alert-danger rounded mb-3">
+                    <i class="fas fa-times-circle mr-1"></i>
+                    {{ authenticationError|trans(authenticationErrorData, 'SchebTwoFactorBundle') }}
+                </div>
+            {% endif %}
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg btn-block">Confirm</button>
+                <a href="{{ logoutPath }}" class="btn btn-info btn-lg btn-block">{{ "cancel"|trans({}, 'SchebTwoFactorBundle') }}</a>
+            </div>
+        </form>
+    </section>
+</div>
+{% endblock %}

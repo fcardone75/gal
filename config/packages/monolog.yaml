@@ -1,0 +1,51 @@
+monolog:
+  channels:
+    - application_import_template
+    - application_import
+    - application_export
+    - application_communication_nsia
+    - app_mailer
+
+  handlers:
+    application_import_template:
+      type: group
+      members: [  application_import_template_local ]
+    application_import:
+      type: group
+      members: [  application_import_local ]
+    application_export:
+      type: group
+      members: [  application_export_local ]
+    application_communication_nsia:
+      type: group
+      members: [  application_communication_nsia_local ]
+    app_mailer:
+      type: group
+      members: [  app_mailer_local ]
+    application_import_template_local:
+      type: stream
+      path: "%kernel.logs_dir%/application_import_template.log"
+      level: debug
+      channels: [ "application_import_template" ]
+    application_import_local:
+      type: stream
+      path: "%kernel.logs_dir%/application_import.log"
+      level: debug
+      channels: [ "application_import" ]
+    application_export_local:
+      type: stream
+      path: "%kernel.logs_dir%/application_export.log"
+      level: debug
+      channels: [ "application_export" ]
+    application_communication_nsia_local:
+      type: rotating_file
+      path: "%kernel.logs_dir%/application_communication_nsia.log"
+      level: info
+      max_files: 10
+      channels: [ "application_communication_nsia" ]
+    app_mailer_local:
+      type: stream
+      path: "%kernel.logs_dir%/mailer.log"
+      level: debug
+      channels: [ "app_mailer" ]
+ 

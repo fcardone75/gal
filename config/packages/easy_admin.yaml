@@ -1,0 +1,5 @@
+# config/packages/easy_admin.yaml
+easy_admin:
+    design:
+        assets:
+            favicon: 'favicon.ico'

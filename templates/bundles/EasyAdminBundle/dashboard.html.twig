@@ -1,0 +1,61 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{% extends '@!EasyAdmin/layout.html.twig' %}
+
+{% block head_favicon %}
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+{% endblock %}
+
+{% block page_title 'Dashboard' %}
+
+{% block main %}
+
+
+
+    <div class="container">
+
+        <div class="row">
+            <form name="ConfidiSelect" method="post" class="ea-new-form" id="new-ConfidiSelect-form">
+                {% if not isConfidiUser %}
+                    <label class="form-control-label" for="confidi">
+                        Confidi
+                        {% for item in confidiData %}
+                            {% if item.selected %}<strong>selezionato: {{ item.label }}</strong>{% endif %}
+                        {% endfor %}
+                    </label>
+                    <div class="form-widget">
+                        <select id="confidi" name="confidi" data-widget="select2" placeholder="Nessun valore" class="form-control">
+                            {% for item in confidiData %}
+                                <option value="{{ item.id }}" {{ item.selected ? 'selected' }}>{{ item.label }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+            </form>
+        </div>
+
+        <div class="row">
+            {% if chartData|length > 0 %}
+                {% for item in chartData %}
+                    <div class="col-6">
+                        <div
+                            class="ct-chart ct-square dashboard-chart"
+                            id="chart-{{ loop.index }}"
+                            data-chart-type="{{ item.type }}"
+                            data-chart-title="{{ item.title }}"
+                            data-chart-labels='{{ item.labels|raw }}'
+                            data-chart-series='{{ item.series|raw }}'
+                        ></div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert chart-no-data">Non ci sono dati da mostrare.</div>
+            {% endif %}
+        </div>
+
+    </div>
+{% endblock %}
+
+{% block configured_javascripts %}
+    {{ parent() }}
+    <script type="application/javascript" src="{{ asset('js/dashboard.js') }}"></script>
+{% endblock %}

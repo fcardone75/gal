@@ -1,0 +1,20 @@
+knp_gaufrette:
+    filesystems:
+        application_import_template:
+            adapter: 'application_import_template_local'
+        application_import:
+            adapter: 'application_import_local'
+        report_import:
+            adapter: 'report_import_local'
+        application_nsia_xml:
+            adapter: 'application_nsia_xml_local'
+        application_nsia_log:
+            adapter: 'application_nsia_log_local'
+        application_message_attachment:
+            adapter: 'application_message_attachment_local'
+        application_group:
+            adapter: 'application_group_local'
+        application_attachment:
+            adapter: 'application_attachment_local'
+        financing_provisioning:
+            adapter: 'financing_provisioning_local'

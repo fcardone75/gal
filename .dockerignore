@@ -1,0 +1,9 @@
+var
+.env
+Dockerfile.*
+Dockerfile
+README.md
+tests
+seed
+env.example
+.gitingore

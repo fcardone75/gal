@@ -1,0 +1,35 @@
+<table class="table" id="{{ type }}-applications">
+    <thead>
+    <tr>
+        <th>{{ 'crud.application_group.applications_grid.column.practice_id'|trans }}</th>
+        <th>{{ 'crud.application_group.applications_grid.column.business_name'|trans }}</th>
+        <th>{{ 'crud.application_group.applications_grid.column.actions'|trans }}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for item in applications %}
+        <tr>
+            <td>{{ item.practiceId }}</td>
+            <td>{{ item.aeIbBusinessName }}</td>
+            <td>
+                {% set buttonLabel = type == 'linked' ? 'crud.application_group.applications_grid.button.remove' : 'crud.application_group.applications_grid.button.add' %}
+                {% set buttonAction = type == 'linked' ? 'ag-remove' : 'ag-add' %}
+
+                <a rel="noopener" class="btn btn-default" target="_blank" href="{{ ea_url().setController('App\\Controller\\Admin\\ApplicationCrudController').setAction('detail').setEntityId(item.id) }}">
+                    {{ 'crud.application_group.applications_grid.button.detail'|trans }}
+                </a>
+                {% if not item.applicationGroup or item.applicationGroup.status == constant('App\\Entity\\ApplicationGroup::STATUS_NEW') %}
+                    <button class="btn btn-primary"
+                            data-action="{{ buttonAction }}"
+                            data-application-id="{{ item.id }}"
+                            data-button-label-add="{{ 'crud.application_group.applications_grid.button.add'|trans }}"
+                            data-button-label-remove="{{ 'crud.application_group.applications_grid.button.remove'|trans }}"
+                    >
+                        {{ buttonLabel|trans }}
+                    </button>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

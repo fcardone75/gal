@@ -1,0 +1,40 @@
+{#<div class="modal fade" id="{{ modalId }}" tabindex="-1" aria-labelledby="{{ modalId }}Label" aria-hidden="true"#}
+{#     data-modal-id="{{ modalId }}"#}
+{#     data-form-id="{{ formId }}"#}
+{#>#}
+{#    <div class="modal-dialog">#}
+{#        <div class="modal-content">#}
+{#            <div class="modal-body">#}
+{#                <h4>{{ title }}</h4>#}
+{#                <p>{{ content }}</p>#}
+{#            </div>#}
+{#            <div class="modal-footer">#}
+{#                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ noLabel }}</button>#}
+{#                <button type="button" class="btn btn-primary">{{ yesLabel }}</button>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+
+{#<script type="text/javascript">#}
+{#    $(function () {#}
+{#        let form = $("#{{ formId }}");#}
+{#        let formBtn = $("#{{ formId }} button[type=submit]");#}
+{#        let yesBtn = $("#{{ modalId }} .btn-primary");#}
+{#        let modal = $('#{{ modalId }}');#}
+
+{#        form.one('submit', function(e) {#}
+{#            e.preventDefault();#}
+{#        });#}
+
+{#        modal.on('hidden.bs.modal', function (e) {#}
+{#            form.one('submit', function(e) {#}
+{#                e.preventDefault();#}
+{#            });#}
+{#        });#}
+
+{#        yesBtn.click(function() {#}
+{#            formBtn.click();#}
+{#        });#}
+{#    });#}
+{#</script>#}

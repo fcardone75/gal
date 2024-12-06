@@ -1,0 +1,10 @@
+{% extends 'mail/base.html.twig' %}
+
+{% block body %}
+    Gentile utente,<br/> è stata creata una nuova utenza su <a href="{{ url('admin') }}">PortaleLiguria</a>.<br/><br/>
+    Ecco le tue credenziali di accesso:<br/>
+    Username: {{ user.username }}<br/>
+    Password: {{ user.plainPassword }}<br/><br/>
+
+    Grazie<br/>
+{% endblock body %}

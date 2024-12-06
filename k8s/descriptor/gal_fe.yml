@@ -1,0 +1,74 @@
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gal-fe
+  namespace: artigiancassa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gal-fe
+  template:
+    metadata:
+      labels:
+        app: gal-fe
+    spec:
+
+      containers:
+      - name: gal-fe
+        image: io.iad2.cloud/artigiancassa/gal-fe:0.0.6
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "40"  
+        ports:
+        - containerPort: 80
+        envFrom:
+        - configMapRef:
+            name: gal-fe-config
+        volumeMounts:
+        - mountPath: /var/www/html/var
+          name: temp-volume-fe
+      volumes:
+      - name: temp-volume-fe
+        emptyDir:
+          medium: Memory
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gal-fe
+  namespace: artigiancassa
+spec:
+  selector:
+    app: gal-fe
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: ClusterIP         
+---
+   apiVersion: v1
+   kind: ConfigMap
+   metadata:
+     name: gal-fe-config
+     namespace: artigiancassa
+   data:
+      PHP_FPM_CLEAR_ENV: "no"
+      NGINX_STATIC_OPEN_FILE_CACHE: "off"
+      NGINX_ERROR_LOG_LEVEL: debug
+      NGINX_VHOST_PRESET: php
+      NGINX_SERVER_ROOT: /var/www/html/public
+      NGINX_BACKEND_HOST: gal-be.artigiancassa.svc.cluster.local
+      APP_ENV: PROD
+      APP_DEBUG: "0"
+      PROJECT_BASE_URL: gal.appdev
+      PROJECT_NAME: gal
+      PHP_IDE_CONFIG: serverName=gal.appdev
+
+    

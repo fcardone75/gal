@@ -1,0 +1,65 @@
+   apiVersion: apps/v1
+   kind: Deployment
+   metadata:
+     name: postgresql
+     namespace: databases
+   spec:
+     replicas: 1
+     selector:
+       matchLabels:
+         app: postgresql
+     template:
+       metadata:
+         labels:
+           app: postgresql
+       spec:
+         containers:
+         - name: postgresql
+           image: postgres:12.5
+           resources:
+             requests:
+               memory: "512Mi"
+               cpu: "500m"
+             limits:
+               memory: "1Gi"
+               cpu: "1"           
+           ports:
+           - containerPort: 5432
+           env:
+           - name: POSTGRES_DB
+             value: ccl
+           - name: POSTGRES_USER
+             value: cclUsr
+           - name: POSTGRES_PASSWORD
+             value: cclPwd
+           volumeMounts:
+            #- name: postgres-dump-volume
+            #  mountPath: /dump
+            - name: postgres-data-volume
+              mountPath: /var/lib/postgresql/data
+         volumes:
+         #- name: postgres-dump-volume
+         #  persistentVolumeClaim:
+         #   claimName: postgres-dump-pvc
+         - name: postgres-data-volume
+           persistentVolumeClaim:
+            claimName: postgres-data-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql
+  namespace: databases
+spec:
+  selector:
+    app: postgresql
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  type: ClusterIP             
+---
+
+    
+
+

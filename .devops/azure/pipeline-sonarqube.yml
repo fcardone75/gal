@@ -1,0 +1,21 @@
+trigger:
+    branches:
+        include:
+            - develop
+            - staging
+            - main
+            
+variables:
+    - group: liguria-gal-sonarqube-vars
+
+pool:
+    'ArtigiancassaAWSPool'
+
+stages:
+    - stage: RunSonarQubeAnalysis
+      displayName: 'SonarQube Analysis'
+      jobs:
+        - job: DeployAppJob
+          displayName: 'Run SonarQube Analysis'
+          steps:
+            - template: templates/sonarqube-analyze.yml

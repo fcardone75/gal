@@ -1,0 +1,9 @@
+{% extends 'mail/base.txt.twig' %}
+
+{% block body %}
+    Attenzione,
+    si è verificata la seguente anomalia durante l'elaborazione dei file NSIA:
+
+    {{ message }}
+
+{% endblock body %}

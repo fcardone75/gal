@@ -1,0 +1,30 @@
+trigger:
+  branches:
+    include:
+      - develop
+variables:
+  - group: common-vars
+  - group: aws-config
+  - group: liguria-gal-env-vars-develop
+stages:
+  - stage: DeployApp
+    displayName: 'Create Application package and Deploy Stage'
+    variables:
+      - name: currentTimestamp
+        value: $[ format('{0:yyyy}{0:MM}{0:dd}{0:HHmmss}', pipeline.startTime) ]
+      - name: currentDeployCommit
+        value: null
+      - name: appZipFilename
+        value: null
+      - name: EBVersionCreated
+        value: null
+      - name: EBVersionDeployed
+        value: null
+      - name: BUILD_ENV
+        value: $(BUILD_ENVIRONMENT)
+    pool: 'ArtigiancassaAWSPool'
+    jobs:
+      - job: DeployAppJob
+        displayName: 'Create Application package and Deploy Job'
+        steps:
+          - template: templates/deploy-pipeline-eb-dev.yml

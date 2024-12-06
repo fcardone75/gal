@@ -1,0 +1,115 @@
+{% extends '@EasyAdmin/crud/form_theme.html.twig' %}
+
+{% block form_row %}
+    {% set row_attr = row_attr|merge({
+        class: row_attr.class|default('') ~ ' form-group'
+    }) %}
+
+    <div {% with { attr: row_attr } %}{{ block('attributes') }}{% endwith %}>
+        {{- form_label(form) -}}
+        <div class="form-widget">
+            {% set has_prepend_html = ea.field.prepend_html|default(null) is not null %}
+            {% set has_append_html = ea.field.append_html|default(null) is not null %}
+            {% set has_input_groups = has_prepend_html or has_append_html %}
+
+            {% if has_input_groups %}<div class="input-group">{% endif %}
+                {% if has_prepend_html %}
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">{{ ea.field.prepend_html|raw }}</span>
+                    </div>
+                {% endif %}
+
+                {{ form_widget(form) }}
+
+                {% if has_append_html %}
+                    <div class="input-group-append">
+                        <span class="input-group-text">{{ ea.field.append_html|raw }}</span>
+                    </div>
+                {% endif %}
+                {% if has_input_groups %}</div>{% endif %}
+
+            {% set nullable_fields_fqcn = [
+                'EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField',
+                'EasyCorp\Bundle\EasyAdminBundle\Field\DateField',
+                'EasyCorp\Bundle\EasyAdminBundle\Field\TimeField',
+            ] %}
+            {% if form.vars.ea_crud_form.ea_field.fieldFqcn|default(false) in nullable_fields_fqcn and ea.field.nullable|default(false) %}
+                <div class="nullable-control">
+                    <label>
+                        <input type="checkbox" {% if data is null %}checked="checked"{% endif %}>
+                        {{ 'label.nullable_field'|trans({}, 'EasyAdminBundle')}}
+                    </label>
+                </div>
+            {% endif %}
+
+            {% if ea.field.help|default(form.vars.help) != '' %}
+                <small class="form-help">{{ ea.field.help|default(form.vars.help)|raw }}</small>
+            {% endif %}
+
+            {{- form_errors(form) -}}
+        </div>
+    </div>
+{% endblock form_row %}
+
+{% block vich_file_widget %}
+    <div class="ea-vich-file">
+        {% if download_uri|default('') is not empty %}
+            {% set download_title = download_uri|split('/')|last ?: 'download'|trans({}, 'VichUploaderBundle') %}
+            {% set file_extension = download_uri|split('.')|last %}
+            {% set extension_icons = {
+                'gif': 'fa-file-image-o',
+                'jpg': 'fa-file-image-o',
+                'pdf': 'fa-file-pdf-o',
+                'png': 'fa-file-image-o',
+                'zip': 'fa-file-archive-o'
+            } %}
+            <a class="ea-vich-file-name" href="{{ asset(download_uri) }}">
+                <i class="fa fa-fw {{ extension_icons[file_extension] ?? 'fa-file-o' }}"></i>
+                {{ download_title|replace({'%20': ' '}) }}
+                {% if download_label %}
+                    <br>
+                    {{ download_label }}
+                {% endif %}
+            </a>
+        {% endif %}
+
+
+        {% if form.vars.disable_upload is not defined or not form.vars.disable_upload %}
+            {% set form_widget_addendum = {
+                'attr': {
+                    'class' : 'vich_upload_file_onchange',
+                    'data-file-upload-id' : form.file.vars.id
+                },
+                'vich': 'true'
+            } %}
+        <div class="ea-vich-file-actions">
+            {# the container element is needed to allow customizing the <input type="file" /> #}
+            <div class="btn btn-secondary input-file-container{% if form.vars.attr and form.vars.attr.disabled is defined %} disabled{% endif %}">
+                <i class="fa fa-fw fa-upload"></i> {{ 'action.choose_file'|trans({}, 'EasyAdminBundle') }}
+                {{ form_widget(form.file, form_widget_addendum) }}
+            </div>
+            <span class="file_uploaded_label"></span>
+            {% if form.delete is defined %}
+                {{ form_row(form.delete, { label: 'form.label.delete'|trans({}, 'VichUploaderBundle') }) }}
+            {% endif %}
+        </div>
+        <div class="small" id="{{ form.file.vars.id }}_new_file_name"></div>
+        {% endif %}
+    </div>
+{% endblock vich_file_widget %}
+
+{% block money_widget -%}
+    {%- set prepend = not (money_pattern starts with '{{') -%}
+    {%- set append = not (money_pattern ends with '}}') -%}
+    {%- if prepend or append -%}
+        <div class="input-group{{ group_class|default('') }}">
+            {{- block('form_widget_simple') -}}
+            <div class="input-group-append">
+                <span class="input-group-text">{{ money_pattern|form_encode_currency }}</span>
+            </div>
+        </div>
+    {%- else -%}
+        {{- block('form_widget_simple') -}}
+    {%- endif -%}
+{%- endblock money_widget %}
+

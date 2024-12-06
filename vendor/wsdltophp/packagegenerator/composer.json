@@ -1,0 +1,149 @@
+{
+    "name": "wsdltophp/packagegenerator",
+    "description": "Generate hierarchical PHP classes based on a WSDL",
+    "type": "library",
+    "keywords" : ["soap","wsdl","php","generator"],
+    "homepage" : "https://github.com/WsdlToPhp/PackageGenerator",
+    "license" : "MIT",
+    "authors" : [
+        {
+            "name": "Mikaël DELSOL",
+            "email": "contact@wsdltophp.com",
+            "homepage": "https://www.wsdltophp.com",
+            "role": "Owner"
+        },
+        {
+            "name": "Gemorroj",
+            "email": "wapinet@mail.ru",
+            "role": "Contributor"
+        },
+        {
+            "name": "ceeram",
+            "email": "c33ram@gmail.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "GroxExMachine",
+            "email": "grox@mail.ru",
+            "role": "Contributor"
+        },
+        {
+            "name": "Jan Zaeske",
+            "email": "mail@jzaeske.de",
+            "role": "Contributor"
+        },
+        {
+            "name": "Tom Mottram",
+            "email": "tom@pay4later.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "Catirau Mihail",
+            "email": "ustmaestro@gmail.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "Alexander M. Turek",
+            "email": "me@derrabus.de",
+            "role": "Contributor"
+        },
+        {
+            "name": "Valérian Girard",
+            "email": "waldo2188@gmail.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "hordijk",
+            "role": "Contributor"
+        },
+        {
+            "name": "Andreas Möller",
+            "email": "am@localheinz.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "Andreas Kintzinger",
+            "role": "Contributor"
+        },
+        {
+            "name": "Hendrik Luup",
+            "email": "hendrik@luup.info",
+            "role": "Contributor"
+        },
+        {
+            "name": "Jacob Dreesen",
+            "email": "jacob.dreesen@gmail.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "Clifford Vickrey",
+            "email": "clifforddavidvickrey@gmail.com",
+            "role": "Contributor"
+        },
+        {
+            "name": "Arnaud POINTET",
+            "role": "Contributor"
+        },
+        {
+            "name": "dypa",
+            "role": "Contributor"
+        },
+        {
+            "name": "gugglegum",
+            "email": "gugglegum@gmail.com",
+            "role": "Contributor"
+        },
+        {
+          "name": "tbreuss",
+          "email": "thomasbreuss@gmx.ch",
+          "role": "Contributor"
+        },
+        {
+          "name": "Alex Krátký",
+          "role": "Contributor"
+        }
+    ],
+    "support" : {
+        "email" : "contact@wsdltophp.com"
+    },
+    "require": {
+        "php": ">=7.4",
+        "ext-dom": "*",
+        "ext-json": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-soap": "*",
+        "composer/composer": "^2.0",
+        "symfony/console": "^4.0|^5.0|^6.0|^7.0",
+        "symfony/yaml": "^4.0|^5.0|^6.0|^7.0",
+        "wsdltophp/packagebase": "^5.0",
+        "wsdltophp/phpgenerator": "^4.0",
+        "wsdltophp/wsdlhandler": "^1.0"
+    },
+    "scripts": {
+        "test": "php-7.4 vendor/bin/phpunit",
+        "lint": "php-7.4 vendor/bin/php-cs-fixer fix --ansi --diff --verbose",
+        "build": "php-7.4 box build --verbose",
+        "phpstan": "php-7.4 vendor/bin/phpstan analyze src --level=2",
+        "rector": "php-7.4 vendor/bin/rector process"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpstan/phpstan": "^1.3",
+        "phpunit/phpunit": "^9",
+        "rector/rector": "^0.15.17"
+    },
+    "autoload": {
+        "psr-4": {
+            "WsdlToPhp\\PackageGenerator\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WsdlToPhp\\PackageGenerator\\Tests\\": "tests"
+        }
+    },
+    "config": {
+        "sort-packages": true
+    }
+}

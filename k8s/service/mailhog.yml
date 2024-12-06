@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mailhog
+  namespace: databases
+  labels:
+    app: mailhog
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mailhog
+  template:
+    metadata:
+      labels:
+        app: mailhog
+    spec:
+      containers:
+      - name: mailhog
+        image: mailhog/mailhog      
+        ports:
+        - containerPort: 1025
+        - containerPort: 8025
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mailhog
+  namespace: databases
+spec:
+  selector:
+    app: mimailhognio
+  ports:
+    - protocol: TCP
+      name: smtp
+      port: 1025
+      targetPort: 1025
+    - protocol: TCP
+      name: ui
+      port: 8025
+      targetPort: 8025
+  type: ClusterIP
+
+          

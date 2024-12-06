@@ -1,0 +1,29 @@
+{#TODO: to delete#}
+{#<script type="text/javascript">#}
+{#    document.addEventListener('DOMContentLoaded', () => {#}
+{#        const body = $('body');#}
+{#        body.on('click', 'button[data-action="ag-add"]', function(e){#}
+{#            e.preventDefault();#}
+
+{#            $('#ApplicationGroup_applications option[value="' + $(this).data('application-id') + '"]').attr('selected', 'selected');#}
+
+{#            $(this)#}
+{#                .html('{{ 'crud.application_group.applications_grid.button.remove'|trans }}')#}
+{#                .attr('data-action', 'ag-remove')#}
+{#                .data('action', 'ag-remove')#}
+{#                .closest('tr').appendTo($('#linked-applications tbody'));#}
+{#        });#}
+
+{#        body.on('click', 'button[data-action="ag-remove"]', function(e){#}
+{#            e.preventDefault();#}
+
+{#            $('#ApplicationGroup_applications option[value="' + $(this).data('application-id') + '"]').removeAttr('selected');#}
+
+{#            $(this)#}
+{#                .html('{{ 'crud.application_group.applications_grid.button.add'|trans }}')#}
+{#                .attr('data-action', 'ag-add')#}
+{#                .data('action', 'ag-add')#}
+{#                .closest('tr').appendTo($('#available-applications tbody'));#}
+{#        });#}
+{#    });#}
+{#</script>#}

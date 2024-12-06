@@ -1,0 +1,157 @@
+steps:
+  - task: CmdLine@2
+    displayName: 'Adding Php Info script page'
+    inputs:
+      script:
+        cp -r $(Build.SourcesDirectory)/.devops/resources/printinfo.$(ENV_APP_ENV).php $(Build.SourcesDirectory)/public/printinfo.php
+
+  - task: CmdLine@2
+    displayName: 'Adding zip install only for php 8.2 platform'
+    inputs:
+      script:
+        cp $(Build.SourcesDirectory)/.devops/resources/01-install-php-zip.sh $(Build.SourcesDirectory)/.platform/hooks/prebuild/01-install-php-zip.sh
+
+  - task: CmdLine@2
+    displayName: 'Replacing composer with dev dependencies'
+    inputs:
+      script:
+        cp $(Build.SourcesDirectory)/.devops/resources/composer.$(ENV_APP_ENV).sh $(Build.SourcesDirectory)/.platform/hooks/postdeploy/10-composer.sh
+
+  - task: CmdLine@2
+    displayName: 'Set variable currentDeployCommit'
+    inputs:
+      script: |
+        HASH=$(git rev-parse HEAD)
+        echo "##vso[task.setvariable variable=currentDeployCommit;]$HASH"
+        echo $HASH
+
+  - task: CmdLine@2
+    displayName: 'Set variable appZipFilename'
+    inputs:
+      script: |
+        ZIPFILENAME=app-$(EB_ENVIRONMENT_TARGET)-$(currentTimestamp)-$(currentDeployCommit).zip
+        echo "##vso[task.setvariable variable=appZipFilename;]$ZIPFILENAME"
+        echo $ZIPFILENAME
+
+  - task: CmdLine@2
+    displayName: 'CleanUp Dirs & Setup current env'
+    inputs:
+      script:
+        mkdir $(Build.SourcesDirectory)/vendor &&
+        mkdir $(Build.SourcesDirectory)/var &&
+        mv $(Build.SourcesDirectory)/.devops/resources/php.$(ENV_APP_ENV).ini $(Build.SourcesDirectory)/.platform/files/php.ini &&
+        mv $(Build.SourcesDirectory)/.devops/resources/$(ENV_APP_ENV).env $(Build.SourcesDirectory)/.env &&
+        rm -r $(Build.SourcesDirectory)/.git
+        $(Build.SourcesDirectory)/.devops
+        $(Build.SourcesDirectory)/tests
+        $(Build.SourcesDirectory)/docker-compose.yml
+
+  - task: CmdLine@2
+    displayName: "Build environment file"
+    inputs:
+      script: |
+        echo '### SYMFONY ENV' >> $(Build.SourcesDirectory)/.env
+        echo 'APP_ENV=$(ENV_APP_ENV)' >> $(Build.SourcesDirectory)/.env
+        echo 'APP_SECRET=$(ENV_APP_SECRET)' >> $(Build.SourcesDirectory)/.env
+        echo 'MAILER_DSN=$(ENV_MAILER_DSN)' >> $(Build.SourcesDirectory)/.env
+        echo 'MAILER_DSN_PEC=$(ENV_MAILER_DSN_PEC)' >> $(Build.SourcesDirectory)/.env
+        echo 'DATABASE_URL=$(ENV_DATABASE_URL)' >> $(Build.SourcesDirectory)/.env
+        echo 'AWS_S3_BUCKET=$(ENV_AWS_S3_BUCKET)' >> $(Build.SourcesDirectory)/.env
+        echo 'AWS_S3_REGION=$(AWS_DEFAULT_REGION)' >> $(Build.SourcesDirectory)/.env
+        echo 'AWS_S3_KEY=$(AWS_APP_KEY)' >> $(Build.SourcesDirectory)/.env
+        echo 'AWS_S3_SECRET=$(AWS_APP_SECRET)' >> $(Build.SourcesDirectory)/.env
+        echo 'MAILER_REDIRECT_FLAG=$(MAILER_REDIRECT_FLAG)' >> $(Build.SourcesDirectory)/.env
+        echo 'MFA_SERVER_NAME=$(MFA_SERVER_NAME)' >> $(Build.SourcesDirectory)/.env
+        echo '### nsia ftp config ###' >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_SFTP_ENABLED=$(ENV_NSIA_SFTP_ENABLED)' >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_SFTP_HOST=$(ENV_NSIA_SFTP_HOST)' >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_SFTP_USERNAME=$(ENV_NSIA_SFTP_USERNAME)' >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_SFTP_PASSWORD=$(ENV_NSIA_SFTP_PASSWORD)' >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_SFTP_ENVIRONMENT=$(ENV_NSIA_SFTP_ENVIRONMENT)' >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_ERROR_MAIL_BCC=$(ENV_NSIA_ERROR_MAIL_BCC)' >> $(Build.SourcesDirectory)/.env
+        echo 'FINANCING_PROVISIONING_CERTIFICATION_MAIL_TO=$(ENV_FINANCING_PROVISIONING_CERTIFICATION_MAIL_TO)'  >> $(Build.SourcesDirectory)/.env
+        echo 'APP_MAILER_DEFAULT_SENDER=$(ENV_APP_MAILER_DEFAULT_SENDER)'  >> $(Build.SourcesDirectory)/.env
+        echo 'APP_MAILER_SENDER_PEC=$(ENV_APP_MAILER_SENDER_PEC)'  >> $(Build.SourcesDirectory)/.env
+        echo 'NSIA_ERROR_MAIL_TO=$(ENV_NSIA_ERROR_MAIL_TO)'  >> $(Build.SourcesDirectory)/.env
+        echo 'TRUSTED_PROXIES=$(ENV_TRUSTED_PROXIES)'  >> $(Build.SourcesDirectory)/.env
+        echo '## END_ENV' >> $(Build.SourcesDirectory)/.env
+        cat $(Build.SourcesDirectory)/.env
+
+  - task: ArchiveFiles@2
+    displayName: "Zip build version"
+    inputs:
+      rootFolderOrFile: "$(Build.SourcesDirectory)"
+      includeRootFolder: false
+      archiveType: "zip"
+      archiveFile: "$(Build.ArtifactStagingDirectory)/$(appZipFilename)"
+      replaceExistingArchive: true
+
+  - task: DownloadSecureFile@1
+    displayName: 'Download GPG private key'
+    inputs:
+      secureFile: '$(GPG_KEY_SECURE_FILE)'
+    name: gpgKey
+
+  - task: CmdLine@2
+    displayName: "Create and sign Zip checksum"
+    inputs:
+      script: |
+        export GPG_TTY=$(tty)
+
+        echo "##[section]Calculating SHA-256 Checksum"
+        sha256sum $(Build.ArtifactStagingDirectory)/$(appZipFilename) > $(Build.ArtifactStagingDirectory)/$(appZipFilename).sha256
+
+        echo "##[section]Importing GPG Secret Key"
+        echo "$(GPG_PASSPHRASE)" | gpg --passphrase-fd 0 --pinentry-mode loopback --yes --import $(gpgKey.secureFilePath)
+
+        echo "##[section]Signing the Checksum File"
+        echo "$(GPG_PASSPHRASE)" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --detach-sign --armor $(Build.ArtifactStagingDirectory)/$(appZipFilename).sha256
+
+        echo "##[section]Removing GPG Secret Key"
+        echo "$(GPG_PASSPHRASE)" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --delete-secret-keys $(GPG_KEYID)
+
+  - task: S3Upload@1
+    displayName: "Upload build to S3"
+    inputs:
+      awsCredentials: '$(AWS_CREDENTIAL)'
+      regionName: '$(AWS_DEFAULT_REGION)'
+      bucketName: '$(EB_S3_Deploy_Bucket)'
+      sourceFolder: '$(Build.ArtifactStagingDirectory)'
+      globExpressions: |
+        $(appZipFilename)
+        $(appZipFilename).sha256
+        $(appZipFilename).sha256.asc
+      targetFolder: '$(EB_APPLICATION_TARGET)'
+      createBucket: true
+      keyManagement: 'awsManaged'
+      encryptionAlgorithm: 'AES256'
+      logRequest: true
+      logResponse: true
+
+  - task: BeanstalkCreateApplicationVersion@1
+    displayName: "Create version EB"
+    inputs:
+      awsCredentials: "$(AWS_CREDENTIAL)"
+      regionName: "$(AWS_DEFAULT_REGION)"
+      applicationName: "$(EB_APPLICATION_TARGET)"
+      applicationType: "s3"
+      deploymentBundleBucket: "$(EB_S3_DEPLOY_BUCKET)"
+      deploymentBundleKey: "$(EB_APPLICATION_TARGET)/$(appZipFilename)"
+      versionLabel: "app-$(EB_ENVIRONMENT_TARGET)-$(currentTimestamp)-$(currentDeployCommit)"
+      outputVariable: "EBVersionCreated"
+      logRequest: true
+      logResponse: true
+
+  - task: BeanstalkDeployApplication@1
+    displayName: "Deploy version EB"
+    inputs:
+      awsCredentials: "$(AWS_CREDENTIAL)"
+      regionName: "$(AWS_DEFAULT_REGION)"
+      applicationName: "$(EB_APPLICATION_TARGET)"
+      environmentName: "$(EB_ENVIRONMENT_TARGET)"
+      applicationType: "version"
+      versionLabel: "$(EBVersionCreated)"
+      outputVariable: "$(EBVersionDeployed)"
+      eventPollingDelay: "3"
+      logRequest: true
+      logResponse: true

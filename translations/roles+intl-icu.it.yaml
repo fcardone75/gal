@@ -1,0 +1,7 @@
+ROLE_SUPER_ADMIN: 'Super Admin'
+ROLE_ADMIN: 'App Admin'
+ROLE_ADMIN_SECURITY: 'Admin Security'
+ROLE_OPERATORE_REGIONE: 'Operatore Regione'
+#ROLE_OPERATORE_ARTIGIANCASSA: 'Operatore Artigiancassa'
+ROLE_OPERATORE_ARTIGIANCASSA: 'Operatore Banca Agevolarti'
+ROLE_OPERATORE_CONFIDI: 'Operatore Confidi'

@@ -1,0 +1,29 @@
+{# @var ea \EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext #}
+{# @var field \EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto #}
+{# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
+{{ dump(ea.crud.currentAction) }}
+{% if ea.crud.currentAction == 'edit' %}
+    {{ dump(field.value) }}
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Codice pratica</th>
+            <th>Ragione Sociale</th>
+            <th>Rimuovi</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in field.value %}
+            <tr>
+                <td>{{ item.practiceId }}</td>
+                <td>{{ item.aeIbBusinessName }}</td>
+                <td>
+                    <input type="checkbox">
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{#{% else %}
+    {{ field.formattedValue }}#}
+{% endif %}

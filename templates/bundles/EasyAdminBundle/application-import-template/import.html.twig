@@ -1,0 +1,10 @@
+{% extends '@EasyAdmin/crud/new.html.twig' %}
+
+{% block main %}
+    {{  parent() }}
+{% endblock main %}
+
+{% block body_javascript %}
+    {{ parent() }}
+    <script type="text/javascript" src="{{ asset('js/vich_file_widget.js') }}"> </script>
+{% endblock body_javascript %}

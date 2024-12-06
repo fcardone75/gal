@@ -1,0 +1,150 @@
+services:
+  mysql:
+    image: mysql:${MYSQL_TAG}
+    container_name: "${PROJECT_NAME}_db"
+    stop_grace_period: 30s
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+      MYSQL_DATABASE: $DB_NAME
+      MYSQL_USER: $DB_USER
+      MYSQL_PASSWORD: $DB_PASSWORD
+    ports:
+      - "${DB_CONTAINER_EXPOSED_PORT:-33061}:3306"
+    volumes:
+      - db_data_1:/var/lib/mysql
+      - .devops/local/db_dumps:/var/tmp/dumps
+      - .devops/local/db_dumps/dump.sql:/docker-entrypoint-initdb.d/dump.sql
+    networks:
+      - my_custom_network
+  postgres:
+    image: postgres:${POSTGRES_TAG}
+    container_name: "${PROJECT_NAME}_db_new"
+    environment:
+      POSTGRES_USER: $DB_USER
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_DB: $DB_NAME
+    ports:
+      - "${PG_CONTAINER_EXPOSED_PORT:-54321}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./dump:/dump
+    networks:
+      - my_custom_network
+  php:
+    build: 
+      context: .
+      dockerfile: Dockerfile.be 
+    container_name: "${PROJECT_NAME}_php"
+    environment:
+      #PHP_SENDMAIL_PATH: /usr/sbin/sendmail -t -i -S mailhog:1025
+      PHP_SMTP: mailhog
+      PHP_SMTP_PORT: 1025
+      DB_HOST: $DB_HOST
+      DB_USER: $DB_USER
+      DB_PASSWORD: $DB_PASSWORD
+      DB_NAME: $DB_NAME
+      PHP_FPM_USER: wodby
+      PHP_FPM_GROUP: wodby
+      PHP_XDEBUG: 1
+      PHP_XDEBUG_MODE: debug
+      PHP_IDE_CONFIG: serverName=${PROJECT_BASE_URL}
+      PHP_XDEBUG_CLIENT_HOST: host.docker.internal
+      PHP_OPCACHE_ENABLE: 0
+      #volumes:
+      #  - cache_php:/var/www/html/var
+
+    networks:
+      - my_custom_network
+  nginx:
+    #image: wodby/nginx:${NGINX_TAG}
+    build:
+      context: .
+      dockerfile: Dockerfile.fe
+    container_name: "${PROJECT_NAME}_nginx"
+    depends_on:
+      - php
+    environment:
+      NGINX_STATIC_OPEN_FILE_CACHE: "off"
+      NGINX_ERROR_LOG_LEVEL: debug
+      NGINX_BACKEND_HOST: php
+      NGINX_VHOST_PRESET: php
+      NGINX_SERVER_ROOT: /var/www/html/public
+      #PHP_OPCACHE_ENABLE: 0
+
+    ports:
+      - "${NGINX_CONTAINER_EXPOSED_PORT:-8000}:80"
+    #volumes:
+    #  - ./:/var/www/html:delegated
+    #volumes:
+    #  - cache_nginx:/var/www/html/var
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${PROJECT_NAME}_nginx.rule=Host(`${PROJECT_BASE_URL}`)"
+      # Enable HTTPS
+      - "traefik.http.routers.${PROJECT_NAME}_nginx.entrypoints=websecure"
+      - "traefik.http.routers.${PROJECT_NAME}_nginx.tls=true"
+      - "traefik.http.routers.${PROJECT_NAME}_nginx.tls.domains[0].main=${PROJECT_BASE_URL}"
+    networks:
+      - my_custom_network
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: email@example.com
+      PGADMIN_DEFAULT_PASSWORD: examplepassword
+    depends_on:
+      - postgres
+    networks:
+      - my_custom_network
+  mailhog:
+    image: mailhog/mailhog
+    container_name: "${PROJECT_NAME}_mailhog"
+    hostname: opensmtpd
+
+    ports:
+      - "${MAILHOG_PORT}:8025"
+      - "2555:1025"  # Mappa la porta 25 alla porta 1025 internamente
+
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.${PROJECT_NAME}_mailhog.entrypoints=websecure"
+      - "traefik.http.routers.${PROJECT_NAME}_mailhog.rule=Host(`mailhog.${PROJECT_BASE_URL}`)"
+      - "traefik.http.routers.${PROJECT_NAME}_mailhog.tls=true"
+      - "traefik.http.routers.${PROJECT_NAME}_mailhog.tls.domains[0].main=mailhog.${PROJECT_BASE_URL}"
+      - "traefik.http.services.${PROJECT_NAME}_mailhog.loadbalancer.server.port=8025"
+    networks:
+      - my_custom_network
+  # S3 Storage provider.
+  minio:
+    hostname: minio
+    image: 'minio/minio:latest'
+    ports:
+      - '${FORWARD_MINIO_PORT:-9101}:9001'
+      - '${FORWARD_MINIO_CONSOLE_PORT:-8900}:8900'
+    environment:
+      MINIO_ROOT_USER: '${AWS_S3_KEY:-AKIAIOSFODNN7EXAMPLE}'
+      MINIO_ROOT_PASSWORD: '${AWS_S3_SECRET:-wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY}'
+      MINIO_DEFAULT_BUCKET: '${AWS_S3_BUCKET:-default_bucket}'
+    volumes:
+      - 'minio:/data/minio'
+    command: minio server /data/minio --console-address ":${FORWARD_MINIO_CONSOLE_PORT:-9001}" --address ":${FORWARD_MINIO_PORT:-9000}"
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9101/minio/health/live" ]
+      retries: 3
+      timeout: 5s
+    networks:
+      - my_custom_network
+volumes:
+  pg_data: {}
+  db_data_1: {}
+  minio: {}
+  #cache_php: {}
+  #cache_nginx: {}
+
+networks:
+  my_custom_network:
+    driver: bridge
+    external: true

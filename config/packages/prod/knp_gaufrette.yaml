@@ -1,0 +1,20 @@
+knp_gaufrette:
+    filesystems:
+        application_import_template:
+            adapter: 'application_import_template_aws_s3'
+        application_import:
+            adapter: 'application_import_aws_s3'
+        report_import:
+            adapter: 'report_import_aws_s3'
+        application_nsia_xml:
+            adapter: 'application_nsia_xml_aws_s3'
+        application_nsia_log:
+            adapter: 'application_nsia_log_aws_s3'
+        application_message_attachment:
+            adapter: 'application_message_attachment_aws_s3'
+        application_group:
+            adapter: 'application_group_aws_s3'
+        application_attachment:
+            adapter: 'application_attachment_aws_s3'
+        financing_provisioning:
+            adapter: 'financing_provisioning_aws_s3'

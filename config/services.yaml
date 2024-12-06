@@ -1,0 +1,271 @@
+# This file is the entry point to configure your own services.
+# Files in the packages/ subdirectory configure your dependencies.
+
+# Put parameters here that don't need to change on each machine where the app is deployed
+# https://symfony.com/doc/current/best_practices/configuration.html#application-related-configuration
+parameters:
+  env(MAILER_REDIRECT_FLAG): 'no'
+  env(MAILER_RECIPIENT_TARGET): 'artigiancassa-services@synesthesia.it'
+  env(APP_SECURITY_RESET_PASSWORD_MIN_INTERVAL): '172800'
+  env(PASSWORD_LIFETIME): '2592000'
+  gpec.envpath: 5
+
+services:
+  # default configuration for services in *this* file
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+  # makes classes in src/ available to be used as services
+  # this creates a service per class whose id is the fully-qualified class name
+  App\:
+    resource: '../src/'
+    exclude:
+      - '../src/DependencyInjection/'
+      - '../src/Entity/'
+      - '../src/Kernel.php'
+      - '../src/Tests/'
+
+  # controllers are imported separately to make sure services can be injected
+  # as action arguments even if you don't extend any base controller class
+  App\Controller\:
+    resource: '../src/Controller/'
+    tags: [ 'controller.service_arguments' ]
+
+  # add more service definitions when explicit configuration is needed
+  # please note that last definitions always *replace* previous ones
+
+  App\Security\LoginFormAuthenticator:
+    arguments:
+      $options:
+        credentials_expired_failure_path: 'security_update_password'
+
+  App\Service\Contracts\Security\SecurityManagerInterface:
+    class: App\Service\Security\SecurityManager
+    arguments:
+      $config:
+        reset_password_min_interval: '%env(APP_SECURITY_RESET_PASSWORD_MIN_INTERVAL)%'
+
+  App\EventSubscriber\Doctrine\UserSubscriber:
+    arguments:
+      $config:
+        user_class: 'App\Entity\User'
+        password_lifetime: '%env(PASSWORD_LIFETIME)%'
+        force_password_change_new_users: true
+        force_password_change_new_users_exclude_roles: [ ]
+        login_failures_interval: 1800
+        lock_after_failures: 6
+        password_field_name: 'password'
+
+    tags:
+      - { name: 'doctrine.event_subscriber' }
+  App\EventSubscriber\Doctrine\ApplicationSubscriber:
+    tags:
+      - { name: 'doctrine.event_subscriber' }
+  App\EventSubscriber\Doctrine\AdditionalContributionSubscriber:
+    tags:
+      - { name: 'doctrine.event_subscriber' }
+  App\EventSubscriber\Doctrine\ApplicationGroupSubscriber:
+    tags:
+      - { name: 'doctrine.event_subscriber' }
+  App\EventSubscriber\Doctrine\ApplicationMessageSubscriber:
+    tags:
+      - { name: 'doctrine.event_subscriber' }
+  App\EventSubscriber\Doctrine\ApplicationMessageAttachmentSubscriber:
+    arguments:
+      $params:
+        url: ""
+    tags:
+      - { name: 'doctrine.event_subscriber' }
+
+  App\EventSubscriber\User\UserPasswordExpirationSubscriber:
+    arguments:
+      $tokenStorage: '@security.token_storage'
+      $security: '@security.helper'
+      $adminUrlGenerator: '@EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator'
+      $translator: '@translator'
+      $config:
+        password_lifetime: '%env(PASSWORD_LIFETIME)%'
+        force_password_change_new_users: true
+        force_password_change_new_users_exclude_roles: [ ]
+    tags:
+      - { name: 'kernel.event_subscriber' }
+
+
+  App\Controller\SecurityController:
+    arguments:
+      $firewallMap: '@security.firewall.map'
+
+  App\Service\Contracts\Security\RoleProviderInterface:
+    class: App\Service\Security\RoleProvider
+    arguments:
+      $roleHierarchy: '%security.role_hierarchy.roles%'
+      $assignableRoles:
+        # - ROLE_SUPER_ADMIN
+        - ROLE_ADMIN
+        - ROLE_ADMIN_SECURITY
+        - ROLE_OPERATORE_REGIONE
+        - ROLE_OPERATORE_ARTIGIANCASSA
+        - ROLE_OPERATORE_CONFIDI
+      $config:
+        role_acl_map:
+          ROLE_SUPER_ADMIN: '*'
+          ROLE_ADMIN:
+            - ROLE_ADMIN_SECURITY
+            - ROLE_OPERATORE_REGIONE
+            - ROLE_OPERATORE_ARTIGIANCASSA
+            - ROLE_OPERATORE_CONFIDI
+          ROLE_ADMIN_SECURITY:
+            - ROLE_ADMIN
+            - ROLE_ADMIN_SECURITY
+            - ROLE_OPERATORE_REGIONE
+            - ROLE_OPERATORE_ARTIGIANCASSA
+            - ROLE_OPERATORE_CONFIDI
+
+  App\Security\Http\Permissions\ApplicationVoter:
+    arguments:
+      $authorizationChecker: '@security.authorization_checker'
+    tags:
+      - { name: 'security.http.permissions.application_voter' }
+
+  App\Model\User\CsvImporter:
+    arguments:
+      $userProvider: '@security.user.provider.concrete.app_user_provider'
+      $map:
+        - email
+        - roles
+        - plain_password
+        - enabled
+        - expires_at
+      $normalizationMap:
+        roles: 'normalizeRoles'
+        expires_at: 'normalizeExpiresAt'
+      $validationMap:
+        email:
+          Symfony\Component\Validator\Constraints\Email: ~
+        expires_at:
+          Symfony\Component\Validator\Constraints\Date: ~
+  App\Service\Contracts\MailerInterface:
+    class: App\Service\Mailer
+    arguments:
+      $logger: '@monolog.logger.app_mailer'
+      $options:
+        sender:
+          reset_password: '%env(APP_MAILER_DEFAULT_SENDER)%'
+          application_message_added: '%env(APP_MAILER_DEFAULT_SENDER)%'
+          user_created: '%env(APP_MAILER_DEFAULT_SENDER)%'
+          nsia_error_message: '%env(APP_MAILER_DEFAULT_SENDER)%'
+          fpc_notification: '%env(APP_MAILER_SENDER_PEC)%'
+        templates:
+          reset_password: 'mail/security/reset_password.html.twig'
+          application_message_added: 'mail/application_message/application_message_added.html.twig'
+          user_created: 'mail/user/user_created.html.twig'
+          nsia_error_message: 'mail/nsia/error_message.html.twig'
+          fpc_notification: 'mail/financing_provisioning_certification/notification.html.twig'
+        recipients:
+          nsia_error_message:
+            to:
+              - '%env(NSIA_ERROR_MAIL_TO)%'
+            bcc:
+              - '%env(NSIA_ERROR_MAIL_BCC)%'
+          fpc_notification:
+            to:
+              - '%env(FINANCING_PROVISIONING_CERTIFICATION_MAIL_TO)%'
+        # Adding this flag in order to redirect emails to a service account
+        redirect:
+          flag: '%env(MAILER_REDIRECT_FLAG)%'
+          recipient_target: '%env(MAILER_RECIPIENT_TARGET)%'
+
+  App\Service\ServerSFTP:
+    arguments:
+      $sftpHost: '%env(NSIA_SFTP_HOST)%'
+      $sftpUsername: '%env(NSIA_SFTP_USERNAME)%'
+      $sftpPassword: '%env(NSIA_SFTP_PASSWORD)%'
+    public: true
+
+  App\Service\Nsia\CommunicationNSIA:
+    arguments:
+      $logger: '@monolog.logger.application_communication_nsia'
+      $basePath: '%kernel.project_dir%'
+      $ftpEnabled: '%env(NSIA_SFTP_ENABLED)%'
+      $ftpEnvironment: '%env(NSIA_SFTP_ENVIRONMENT)%'
+    public: true
+
+  app.aws_s3.client:
+    class: Aws\S3\S3Client
+    factory: [ Aws\S3\S3Client, 'factory' ]
+    public: true
+    arguments:
+      - version: latest
+        region: '%env(resolve:AWS_S3_REGION)%'
+        credentials:
+          key: '%env(resolve:AWS_S3_KEY)%'
+          secret: '%env(resolve:AWS_S3_SECRET)%'
+        endpoint: '%env(resolve:AWS_S3_ENDPOINT)%'
+        use_path_style_endpoint: '%env(bool:AWS_S3_USE_PATH_STYLE_ENDPOINT)%'
+
+  App\Service\Contracts\Import\Config\FileLocatorInterface:
+    class: Symfony\Component\Config\FileLocator
+    arguments:
+      $paths: [ '%kernel.project_dir%/config/import' ]
+  App\Service\Contracts\Import\Config\YamlFileLoaderInterface:
+    class: App\Service\Import\Config\YamlFileLoader
+    arguments:
+      $locator: '@App\Service\Contracts\Import\Config\FileLocatorInterface'
+  App\Service\Import\ApplicationImportTemplateManager:
+    arguments:
+      $logger: '@monolog.logger.application_import_template'
+  App\Service\Import\ApplicationImportManager:
+    arguments:
+      $logger: '@monolog.logger.application_import'
+
+
+  App\Service\Contracts\Export\Config\FileLocatorInterface:
+    class: Symfony\Component\Config\FileLocator
+    arguments:
+      $paths: [ '%kernel.project_dir%/config/export' ]
+  App\Service\Contracts\Export\Config\YamlFileLoaderInterface:
+    class: App\Service\Export\Config\YamlFileLoader
+    arguments:
+      $locator: '@App\Service\Contracts\Export\Config\FileLocatorInterface'
+  #    App\Service\Export\ApplicationExportTemplateManager:
+  #        arguments:
+  #            $logger: '@monolog.logger.application_export_template'
+  App\Service\Export\ApplicationExportManager:
+    arguments:
+      $logger: '@monolog.logger.application_export'
+
+
+  App\Admin\Field\Configurator\ApplicationStatusLogsConfigurator:
+    tags:
+      - { name: 'ea.field_configurator' }
+  App\Service\Contracts\ApplicationGroupManagerInterface:
+    class: App\Service\ApplicationGroupManager
+    arguments:
+      #            $protocolNumberPrefix: 'FDR'
+      $protocolNumberPrefix: 'Liguria'
+
+  App\Command\SendTestMailCommand:
+    class: App\Command\SendTestMailCommand
+    arguments:
+      $sender: '%env(APP_MAILER_DEFAULT_SENDER)%'
+      $pecSender: '%env(APP_MAILER_SENDER_PEC)%'
+
+  App\Command\SendSyncLogToS3Command:
+    class: App\Command\SendSyncLogToS3Command
+    arguments:
+      $filesystemMap: '@knp_gaufrette.filesystem_map'
+      $logDir: '%kernel.logs_dir%'
+    tags:
+      - { name: 'console.command' }
+
+  Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler:
+    arguments:
+      - '%env(DATABASE_URL)%'
+  Symfony\Component\DependencyInjection\ContainerInterface:
+    alias: 'service_container'
+
+  Bni\Gpec\Gpec\GpecService:
+    arguments:
+      $upFolderEnvFile: '%gpec.envpath%'
+    public: true

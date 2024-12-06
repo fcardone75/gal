@@ -1,0 +1,8 @@
+trigger: 'none'
+
+variables:
+    - group: aws-config
+    - group: liguria-gal-env-vars-develop
+
+jobs:
+    - template: templates/reset-cache-symfony.yml

@@ -1,0 +1,651 @@
+App\Entity\User:
+  constraints:
+    - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: email
+    - App\Validator\Constraints\ChangePasswordFrequency:
+        maxFrequency: 172800
+        errorPath: 'plainPassword'
+        groups:
+          - 'change_password'
+  properties:
+    confidi:
+        - Type:
+            type: [object]
+    email:
+        - Email:
+#    roles:
+#        - App\Validator\Constraints\Roles:
+    firstName:
+#        - Type:
+#            type: [string]
+        - Regex:
+#            pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+            pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+            message: 'text_field_regex'
+    lastName:
+#        - Type:
+#            type: [string]
+        - Regex:
+#            pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+            pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+            message: 'text_field_regex'
+    mobilePhone:
+        - Type:
+            type: [numeric]
+    fiscalId:
+#        - Type:
+#            type: [string]
+        - Regex:
+            pattern: '/^([A-Za-z]{6}\d{2}[A-Za-z]{1}\d{2}[A-Za-z]{1}\d{3}[A-Za-z]{1})$|^(\d{11})$/'
+#          message: 'fiscal_code_regex'
+      #    expiresAt:
+      #    birth:
+    birthCountry:
+#        - Type:
+#            type: [string]
+        - Regex:
+#            pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+            pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+            message: 'text_field_regex'
+    birthRegion:
+#        - Type:
+#            type: [string]
+        - Regex:
+#            pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+            pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+            message: 'text_field_regex'
+    birthProvince:
+#        - Type:
+#            type: [string]
+        - Regex:
+#            pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+            pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+            message: 'text_field_regex'
+    plainPassword:
+      - App\Validator\Constraints\PasswordNeverUsed:
+          lookBackItems: 10
+      - App\Validator\Constraints\SecurePassword:
+          properties:
+            - 'email'
+      - Regex:
+          pattern: '/(?=.{8,})(?=.*?[^\w\s])(?=.*?[0-9])(?=.*?[A-Z]).*?[a-z].*/'
+          message: 'password_regex'
+
+App\Entity\Confidi:
+  properties:
+    businessName:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+# TODO: verify
+#          pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+          pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+          message: 'text_field_regex'
+    legalRepresentative:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+# TODO: verify
+#          pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+          pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+          message: 'text_field_regex'
+    iban:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+          pattern: '/^(it|IT)[0-9]{2}[A-Za-z][0-9]{10}[0-9A-Za-z]{12}$/'
+#          message: 'iban_code_regex'
+    fiscalCode:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+          pattern: '/^([A-Za-z]{6}\d{2}[A-Za-z]{1}\d{2}[A-Za-z]{1}\d{3}[A-Za-z]{1})$|^(\d{11})$/'
+#          message: 'fiscal_code_regex'
+    nsiaCode:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [numeric]
+      - Regex:
+# TODO: verify
+          pattern: '/^\d{5}$/'
+#          message: 'code_regex'
+
+App\Entity\Bank:
+  properties:
+    name:
+      - NotNull: ~
+      - NotBlank: ~
+      - Type:
+          type: [string]
+      - Regex:
+# TODO: verify
+#          pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+          pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+          message: 'text_field_regex'
+    code:
+      - NotNull: ~
+      - NotBlank: ~
+      - Type:
+          type: [numeric]
+      - Regex:
+# TODO: verify
+          pattern: '/^\d{5}$/'
+#          message: 'code_regex'
+    template:
+      - NotNull: ~
+      - NotBlank: ~
+      - Type:
+          type: [object]
+
+App\Entity\BankLeasing:
+  properties:
+    name:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+# TODO: verify
+#          pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+          pattern: '/^[A-Za-zÀ-Üà-ü0-9\s''&,.-]*$/'
+          message: 'text_field_regex'
+    code:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [numeric]
+      - Regex:
+# TODO: verify
+          pattern: '/^\d{5}$/'
+#          message: 'code_regex'
+    template:
+      - Type:
+          type: [object]
+
+App\Entity\AtecoCode:
+  properties:
+    code:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+# TODO: verify
+          pattern: '/^\d\d?(?:\.\d\d?)?(?:\.\d\d?)?$/'
+#          message: 'ateco_code_field_regex'
+    codeWithoutDots:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [numeric]
+      - Regex:
+# TODO: verify
+          pattern: '/^\d{2,6}$/'
+#          message: 'ateco_code_without_dots_text_field_regex'
+    description:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+# TODO: verify
+          pattern: '/^[A-Za-zÀ-Üà-ü\s'']*$/'
+          message: 'text_field_regex'
+    section:
+      - NotNull: ~
+      - NotBlank: ~
+#      - Type:
+#          type: [string]
+      - Regex:
+# TODO: verify
+          pattern: '/^[A-Z]{1}$/'
+#          message: 'one_char_regex'
+
+App\Entity\ApplicationImportTemplate:
+  constraints:
+    - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity: revision
+    - App\Validator\Constraints\Import\TemplateUniqueRevision:
+        errorPath: 'filenameFile'
+  properties:
+    revision:
+      - Regex:
+          pattern: '/^(\d+\.)?(\d+\.)?(\d+)$/'
+App\Entity\ApplicationImport:
+  constraints:
+    - App\Validator\Constraints\Import\ValidImportSpreadsheet:
+        errorPath: 'filenameFile'
+  properties:
+    filenameFile:
+      - File:
+          mimeTypes:
+            - 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            - 'application/zip'
+    assuranceEnterpriseImports:
+      - Symfony\Component\Validator\Constraints\Valid: ~
+    financingImports:
+      - Symfony\Component\Validator\Constraints\Valid: ~
+    leasingImports:
+      - Symfony\Component\Validator\Constraints\Valid: ~
+
+App\Entity\AssuranceEnterpriseImport:
+  constraints:
+    - Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity:
+        fields:
+          - 'practiceId'
+          - 'applicationImport'
+        errorPath: 'practiceId'
+        message: 'assurance_enterprise_import.unique_practice_id'
+    - App\Validator\Constraints\Import\AvailablePracticeId: ~
+    - App\Validator\Constraints\Import\ConsistentPracticeId: ~
+    - App\Validator\Constraints\Import\AcApplicationMembersValid: ~
+    - App\Validator\Constraints\Import\ValidAssuranceAmount: ~
+    - Callback: validate
+    - App\Validator\Constraints\Import\OfficeWorkplaceCityInRegion: ~
+    - App\Validator\Constraints\Import\CompanySize:
+        properties:
+          - ibSize
+    - App\Validator\Constraints\Import\LegalForm:
+        properties:
+          - ibLegalForm
+    - App\Validator\Constraints\Import\City:
+        properties:
+          - officeCity
+    - App\Validator\Constraints\Import\MembersValid:
+        constraints:
+          firstname:
+            - NotNull: ~
+            - NotBlank: ~
+          lastname:
+            - NotNull: ~
+            - NotBlank: ~
+          birthDate:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+                message: 'application_import.invalid_date_format'
+            - DateTime:
+                format: 'd/m/Y'
+          gender:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^(M|F)$/'
+          fiscalCode:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^([A-Za-z]{6}\d{2}[A-Za-z]{1}\d{2}[A-Za-z]{1}\d{3}[A-Za-z]{1})$|^(\d{11})$/'
+            - App\Validator\Constraints\FiscalId: ~
+  properties:
+    practiceId:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^[\w|\d]+$/'
+          message: 'practice_id_regex'
+    flagEnergia:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+#          pattern: '/^(S|N)$/'
+          pattern: '/^(S|N|s|n)$/'
+          message: 'application_import.invalid_yesno'
+    gAssuranceAmount:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d+(,\d{1,2})?$/'
+          message: 'application_import.invalid_float'
+    gResolutionDate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    acCommissionsRebateRequest:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+#          pattern: '/^(S|N)$/'
+          pattern: '/^(S|N|s|n)$/'
+          message: 'application_import.invalid_yesno'
+    acInterestsContributionRequest:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+#          pattern: '/^(S|N)$/'
+          pattern: '/^(S|N|s|n)$/'
+          message: 'application_import.invalid_yesno'
+    acLostFundContributionRequest:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+#          pattern: '/^(S|N)$/'
+          pattern: '/^(S|N|s|n)$/'
+          message: 'application_import.invalid_yesno'
+    ibBusinessName:
+      - NotNull: ~
+      - NotBlank: ~
+    ibFiscalCode:
+      - Regex:
+          pattern: '/^([A-Za-z]{6}\d{2}[A-Za-z]{1}\d{2}[A-Za-z]{1}\d{3}[A-Za-z]{1})$|^(\d{11})$/'
+          message: 'assurance_enterprise_import.fiscal_code'
+      - App\Validator\Constraints\FiscalId: ~
+    ibSize:
+      - NotNull: ~
+      - NotBlank: ~
+    ibConstitutionDate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    ibChamberOfCommerceCode:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^[A-Za-z]{2}\d{8}$/'
+          message: 'assurance_enterprise_import.invalid_chamber_of_commerce_code'
+    ibChamberOfCommerceRegistrationDate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    ibAIACode:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^[A-Za-z]{2}\d{7}$/'
+          message: 'assurance_enterprise_import.ib_aia_code'
+    ibAIARegistrationDate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    ibAtecoCode:
+      - NotNull: ~
+      - NotBlank: ~
+      - App\Validator\Constraints\Import\AtecoCode: ~
+    ibAtecoStartDate:
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    ibLegalForm:
+      - NotNull: ~
+      - NotBlank: ~
+    pecAddress:
+      - NotNull: ~
+      - NotBlank: ~
+      - Email:
+          mode: 'loose'
+    officeAddress:
+      - NotNull: ~
+      - NotBlank: ~
+    officePostcode:
+      - NotNull: ~
+      - NotBlank: ~
+    officeCity:
+      - NotNull: ~
+      - NotBlank: ~
+
+App\Entity\FinancingImport:
+  constraints:
+    - App\Validator\Constraints\Import\ConsistentPracticeId: ~
+    - App\Validator\Constraints\Import\OtherBankInformationValid: ~
+    - App\Validator\Constraints\Import\Bank:
+        properties:
+          - dbfBank
+    - App\Validator\Constraints\Import\FinancialDestination:
+        properties:
+          - fFinancialDestination
+    - App\Validator\Constraints\Import\FinancingDataValid:
+        classConstraints:
+          - App\Validator\Constraints\Import\Periodicity:
+              properties:
+                - dfPeriodicity
+        constraints:
+          dfContractSignatureDate:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+                message: 'application_import.invalid_date_format'
+            - DateTime:
+                format: 'd/m/Y'
+          dfIssueDate:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+                message: 'application_import.invalid_date_format'
+            - DateTime:
+                format: 'd/m/Y'
+          dfPeriodicity:
+            - NotNull: ~
+            - NotBlank: ~
+          dfFirstDepreciationDeadline:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+                message: 'application_import.invalid_date_format'
+            - DateTime:
+                format: 'd/m/Y'
+          dfPreDepreciationExists:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+#                pattern: '/^(S|N)$/'
+                pattern: '/^(S|N|s|n)$/'
+                message: 'application_import.invalid_yesno'
+          tRateType:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^(V|F)$/'
+                message: 'application_import.invalid_rate_type'
+          tRate:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^\d+(,\d{1,2})?$/'
+                message: 'application_import.invalid_float'
+            - App\Validator\Constraints\Import\FloatStringLessThanOrEqualTo:
+                value: 100
+          tTaeg:
+            - NotNull: ~
+            - NotBlank: ~
+            - Regex:
+                pattern: '/^\d+(,\d{1,2})?$/'
+                message: 'application_import.invalid_float'
+            - App\Validator\Constraints\Import\FloatStringLessThanOrEqualTo:
+                value: 100
+  properties:
+    practiceId:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^[\w|\d]+$/'
+          message: 'practice_id_regex'
+    dbfBank:
+        - NotNull: ~
+        -   NotBlank: ~
+    fFinancialDestination:
+        -   NotNull: ~
+        -   NotBlank: ~
+    dfLoanProvidedAtImport:
+        -   NotNull: ~
+        -   NotBlank: ~
+        -   Regex:
+#                pattern: '/^(S|N)$/'
+                pattern: '/^(S|N|s|n)$/'
+                message: 'application_import.invalid_yesno'
+    dfAmount:
+        -   NotNull: ~
+        -   NotBlank: ~
+        -   Regex:
+                pattern: '/^\d+(,\d{1,2})?$/'
+                message: 'application_import.invalid_float'
+    dfResolutionDate:
+        -   NotNull: ~
+        -   NotBlank: ~
+        -   Regex:
+                pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+                message: 'application_import.invalid_date_format'
+        -   DateTime:
+                format: 'd/m/Y'
+    dfDuration:
+        -   NotNull: ~
+        -   NotBlank: ~
+        -   Type:
+                type: 'numeric'
+App\Entity\LeasingImport:
+  constraints:
+    - App\Validator\Constraints\Import\ConsistentPracticeId: ~
+    - App\Validator\Constraints\Import\OtherBankInformationValid: ~
+    - App\Validator\Constraints\Import\BankLeasing:
+        properties:
+          - sfBankLeasing
+    - App\Validator\Constraints\Import\LeasingDestination:
+        properties:
+          - sfLeasingDestination
+    - App\Validator\Constraints\Import\Periodicity:
+        properties:
+          - dclPeriodicity
+  properties:
+    practiceId:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^[\w|\d]+$/'
+          message: 'practice_id_regex'
+    sfBankLeasing:
+      - NotNull: ~
+      - NotBlank: ~
+    sfLeasingDestination:
+      - NotNull: ~
+      - NotBlank: ~
+    dclAmount:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d+(,\d{1,2})?$/'
+          message: 'application_import.invalid_float'
+    dclContractSignatureDate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    dclResolutionDate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    dclDuration:
+      - NotNull: ~
+      - NotBlank: ~
+      - Type:
+          type: 'numeric'
+    dclPeriodicity:
+      - NotNull: ~
+      - NotBlank: ~
+    dclFirstDeadline:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d{2}\/\d{2}\/\d{4}$/'
+          message: 'application_import.invalid_date_format'
+      - DateTime:
+          format: 'd/m/Y'
+    dclFeeAmount:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d+(,\d{1,2})?$/'
+          message: 'application_import.invalid_float'
+    dclFeePercentage:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d+(,\d{1,2})?$/'
+          message: 'application_import.invalid_float'
+      - App\Validator\Constraints\Import\FloatStringLessThanOrEqualTo:
+          value: 100
+    dclRansomPercentage:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d+(,\d{1,2})?$/'
+          message: 'application_import.invalid_float'
+      - App\Validator\Constraints\Import\FloatStringLessThanOrEqualTo:
+          value: 100
+    dclRate:
+      - NotNull: ~
+      - NotBlank: ~
+      - Regex:
+          pattern: '/^\d+(,\d{1,2})?$/'
+          message: 'application_import.invalid_float'
+      - App\Validator\Constraints\Import\FloatStringLessThanOrEqualTo:
+          value: 100
+
+App\Entity\ApplicationGroup:
+  constraints:
+    - App\Validator\Constraints\AllowProtocol: ~
+  properties:
+    filenameFile:
+      - App\Validator\Constraints\FileP7M: ~
+
+App\Entity\FinancingProvisioningCertification:
+    constraints:
+        - App\Validator\Constraints\AllowProtocol: ~
+    properties:
+        amount:
+            -   NotNull: ~
+            -   NotBlank: ~
+            -   Type:
+                    type: 'numeric'
+        contractSignatureDate:
+            - NotNull: ~
+            - NotBlank: ~
+        issueDate:
+            - NotNull: ~
+            - NotBlank: ~
+        firstDepreciationDeadline:
+            - NotNull: ~
+            - NotBlank: ~
+        filenameFile:
+            - App\Validator\Constraints\FileP7M:
+                allowSimplePdf : true
+
+App\Entity\ApplicationMessage:
+    properties:
+        text:
+            - NotNull: ~
+            - NotBlank: ~

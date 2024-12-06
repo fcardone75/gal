@@ -1,0 +1,24 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+    #csrf_protection: true
+    #http_method_override: true
+
+    # Enables session support. Note that the session will ONLY be started if you read or write from it.
+    # Remove or comment this section to explicitly disable session support.
+    session:
+        handler_id: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
+        cookie_secure: auto
+        cookie_samesite: lax
+        save_path: '%env(resolve:DATABASE_URL)%'
+
+    #esi: true
+    #fragments: true
+    php_errors:
+        log: true
+    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+
+parameters:
+    env(AWS_CLOUD_WATCH_LOGLEVEL): 'INFO'
+    env(AWS_CLOUD_WATCH_ENABLED): 'true'
+    env(AWS_CLOUD_WATCH_BATCH): "50"

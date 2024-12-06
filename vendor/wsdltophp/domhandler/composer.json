@@ -1,0 +1,55 @@
+{
+    "name": "wsdltophp/domhandler",
+    "type": "library",
+    "description": "Decorative design pattern to ease DOM handling",
+    "keywords": [
+        "xml",
+        "dom",
+        "xpath",
+        "php"
+    ],
+    "homepage": "https://github.com/WsdlToPhp/DomHandler",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mikaël DELSOL",
+            "email": "contact@wsdltophp.com",
+            "homepage": "https://www.wsdltophp.com",
+            "role": "Owner"
+        },
+        {
+            "name": "phordijk",
+            "role": "Contributor"
+        }
+    ],
+    "require": {
+        "php": ">=7.4",
+        "ext-dom": "*"
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "~3.0",
+        "phpstan/phpstan": "^1.4",
+        "phpunit/phpunit": "^9"
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "WsdlToPhp\\DomHandler\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "WsdlToPhp\\DomHandler\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "lint": "vendor/bin/php-cs-fixer fix --ansi --diff --verbose",
+        "phpstan": "vendor/bin/phpstan analyze src --level=7"
+    },
+    "support": {
+        "email": "contact@wsdltophp.com"
+    }
+}

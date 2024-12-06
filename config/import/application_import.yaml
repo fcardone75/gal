@@ -1,0 +1,499 @@
+validation:
+    references_sheet_name: 'Riferimenti'
+    revision_cell: 'B2'
+sheets:
+    assurance_enterprise:
+        name: 'Domanda-Impresa'
+        entity: 'App\Entity\AssuranceEnterpriseImport'
+        row_start: 4
+        map:
+            practiceId: 'A'
+            flagEnergia:
+                column: 'B'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            gAssuranceAmount:
+                column: 'C'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            gResolutionDate:
+                column: 'D'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            acCommissionsRebateRequest:
+                column: 'E'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            acInterestsContributionRequest:
+                column: 'F'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            acLostFundContributionRequest:
+                column: 'G'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            acContributionApplicationAmount:
+                column: 'H'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            acApplicationMembers: 'I'
+            ibBusinessName: 'J'
+            ibFiscalCode: 'K'
+            ibSize: 'L'
+            ibConstitutionDate:
+                column: 'M'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            ibChamberOfCommerceCode: 'N'
+            ibChamberOfCommerceRegistrationDate:
+                column: 'O'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            ibAIACode: 'P'
+            ibAIARegistrationDate:
+                column: 'Q'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            ibAtecoCode: 'R'
+            ibAtecoStartDate:
+                column: 'S'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            ibIban: 'T'
+            ibLegalForm: 'U'
+            pecAddress: 'V'
+            officeAddress: 'W'
+            officePostcode: 'X'
+            officeCity: 'Y'
+            workplaceAddress: 'Z'
+            workplacePostcode: 'AA'
+            workplaceCity: 'AB'
+            ownerLastname: 'AC'
+            ownerFirstname: 'AD'
+            ownerBirthDate:
+                column: 'AE'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            ownerGender:
+                column: 'AF'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            ownerFiscalCode: 'AG'
+            ownerBirthCity: 'AH'
+            ownerBirthCountry: 'AI'
+            ownerJoinDate: 'AJ'
+            firstMemberLastname: 'AK'
+            firstMemberFirstname: 'AL'
+            firstMemberBirthDate:
+                column: 'AM'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            firstMemberGender:
+                column: 'AN'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            firstMemberFiscalCode: 'AO'
+            firstMemberBirthCity: 'AP'
+            firstMemberBirthCountry: 'AQ'
+            firstMemberJoinDate:
+                column: 'AR'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            secondMemberLastname: 'AS'
+            secondMemberFirstname: 'AT'
+            secondMemberBirthDate:
+                column: 'AU'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            secondMemberGender:
+                column: 'AV'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            secondMemberFiscalCode: 'AW'
+            secondMemberBirthCity: 'AX'
+            secondMemberBirthCountry: 'AY'
+            secondMemberJoinDate:
+                column: 'AZ'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            thirdMemberLastname: 'BA'
+            thirdMemberFirstname: 'BB'
+            thirdMemberBirthDate:
+                column: 'BC'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            thirdMemberGender:
+                column: 'BD'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            thirdMemberFiscalCode: 'BE'
+            thirdMemberBirthCity: 'BF'
+            thirdMemberBirthCountry: 'BG'
+            thirdMemberJoinDate:
+                column: 'BH'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            fourthMemberLastname: 'BI'
+            fourthMemberFirstname: 'BJ'
+            fourthMemberBirthDate:
+                column: 'BK'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            fourthMemberGender:
+                column: 'BL'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            fourthMemberFiscalCode: 'BM'
+            fourthMemberBirthCity: 'BN'
+            fourthMemberBirthCountry: 'BO'
+            fourthMemberJoinDate:
+                column: 'BP'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+    financing_import:
+        name: 'Finanziamento'
+        entity: 'App\Entity\FinancingImport'
+        row_start: 4
+        map:
+            practiceId: 'A'
+            dbfBank: 'B'
+            dbfBusinessName: 'C'
+            dbfABI: 'D'
+            fFinancialDestination: 'E'
+            dfLoanProvidedAtImport: 'F'
+            dfAmount:
+                column: 'G'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            dfContractSignatureDate:
+                column: 'H'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dfResolutionDate:
+                column: 'I'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dfIssueDate:
+                column: 'J'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dfDuration: 'K'
+            dfPeriodicity: 'L'
+            dfFirstDepreciationDeadline:
+                column: 'M'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dfPreDepreciationExists:
+                column: 'N'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            dfInstallmentAmount:
+                column: 'O'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            tRateType:
+                column: 'P'
+                callbacks:
+                    - [ truncateString, [ 1 ] ]
+            tRate:
+                column: 'Q'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            tTaeg:
+                column: 'R'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+    leasing_import:
+        name: 'Leasing'
+        entity: 'App\Entity\LeasingImport'
+        row_start: 4
+        map:
+            practiceId: 'A'
+            sfBankLeasing: 'B'
+            sfBusinessName: 'C'
+            sfLeasingDestination: 'D'
+            dclAmount:
+                column: 'E'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            dclContractSignatureDate:
+                column: 'F'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dclResolutionDate:
+                column: 'G'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dclDuration: 'H'
+            dclPeriodicity: 'I'
+            dclFirstDeadline:
+                column: 'J'
+                input_type: 'date'
+                xls_number_format: 'dd/mm/yyyy'
+            dclFeeAmount:
+                column: 'K'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            dclFeePercentage:
+                column: 'L'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            dclRansomPercentage:
+                column: 'M'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+            dclRate:
+                column: 'N'
+                input_type: 'float'
+                xls_number_format: '#.##'
+                callbacks:
+                    - forceFloatToString
+    references:
+        name: 'Riferimenti'
+        import: false
+conversion:
+    assurance_enterprise:
+        entity: App\Entity\AssuranceEnterpriseImport
+        starter: true
+        callbacks:
+            - createAdditionalContributionItems
+        map:
+            practiceId: practiceId
+            flagEnergia: flagEnergia
+            gAssuranceAmount:
+                property: aeGAssuranceAmount
+                callbacks:
+                    - stringToFloat
+            gResolutionDate:
+                property: aeGResolutionDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            acCommissionsRebateRequest: aeAcCommissionsRebateRequest
+            acInterestsContributionRequest: aeAcInterestsContributionRequest
+            acLostFundContributionRequest: aeAcLostFundContributionRequest
+            acContributionApplicationAmount:
+                property: aeAcContributionApplicationAmount
+                callbacks:
+                    - stringToFloat
+            acApplicationMembers:
+                property: aeAcApplicationMembers
+                callbacks:
+                    - stringToInt
+            ibBusinessName: aeIbBusinessName
+            ibFiscalCode: aeIbFiscalCode
+            ibSize: aeIbSize
+            ibConstitutionDate:
+                property: aeIbConstitutionDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            ibChamberOfCommerceCode: aeIbChamberOfCommerceCode
+            ibChamberOfCommerceRegistrationDate:
+                property: aeIbChamberOfCommerceRegistrationDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            ibAIACode: aeIbAIACode
+            ibAIARegistrationDate:
+                property: aeIbAIARegistrationDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            ibAtecoCode: aeIbAtecoCode
+            ibAtecoStartDate:
+                property: aeIbAtecoStartDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            ibIban: aeIbIban
+            ibLegalForm: aeIbLegalForm
+            pecAddress: aePecAddress
+            officeAddress: aeOfficeAddress
+            officePostcode: aeOfficePostcode
+            officeCity: aeOfficeCity
+            workplaceAddress: aeWorkplaceAddress
+            workplacePostcode: aeWorkplacePostcode
+            workplaceCity: aeWorkplaceCity
+            ownerLastname: aeOwnerLastname
+            ownerFirstname: aeOwnerFirstname
+            ownerBirthDate:
+                property: aeOwnerBirthDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            ownerGender: aeOwnerGender
+            ownerFiscalCode: aeOwnerFiscalCode
+            ownerBirthCity: aeOwnerBirthCity
+            ownerBirthCountry: aeOwnerBirthCountry
+            ownerJoinDate:
+                property: aeOwnerJoinDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            firstMemberLastname: aeFirstMemberLastname
+            firstMemberFirstname: aeFirstMemberFirstname
+            firstMemberBirthDate:
+                property: aeFirstMemberBirthDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            firstMemberGender: aeFirstMemberGender
+            firstMemberFiscalCode: aeFirstMemberFiscalCode
+            firstMemberBirthCity: aeFirstMemberBirthCity
+            firstMemberBirthCountry: aeFirstMemberBirthCountry
+            firstMemberJoinDate:
+                property: aeFirstMemberJoinDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            secondMemberLastname: aeSecondMemberLastname
+            secondMemberFirstname: aeSecondMemberFirstname
+            secondMemberBirthDate:
+                property: aeSecondMemberBirthDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            secondMemberGender: aeSecondMemberGender
+            secondMemberFiscalCode: aeSecondMemberFiscalCode
+            secondMemberBirthCity: aeSecondMemberBirthCity
+            secondMemberBirthCountry: aeSecondMemberBirthCountry
+            secondMemberJoinDate:
+                property: aeSecondMemberJoinDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            thirdMemberLastname: aeThirdMemberLastname
+            thirdMemberFirstname: aeThirdMemberFirstname
+            thirdMemberBirthDate:
+                property: aeThirdMemberBirthDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            thirdMemberGender: aeThirdMemberGender
+            thirdMemberFiscalCode: aeThirdMemberFiscalCode
+            thirdMemberBirthCity: aeThirdMemberBirthCity
+            thirdMemberBirthCountry: aeThirdMemberBirthCountry
+            thirdMemberJoinDate:
+                property: aeThirdMemberJoinDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            fourthMemberLastname: aeFourthMemberLastname
+            fourthMemberFirstname: aeFourthMemberFirstname
+            fourthMemberBirthDate:
+                property: aeFourthMemberBirthDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            fourthMemberGender: aeFourthMemberGender
+            fourthMemberFiscalCode: aeFourthMemberFiscalCode
+            fourthMemberBirthCity: aeFourthMemberBirthCity
+            fourthMemberBirthCountry: aeFourthMemberBirthCountry
+            fourthMemberJoinDate:
+                property: aeFourthMemberJoinDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+    financing:
+        entity: App\Entity\FinancingImport
+        criteria:
+            - applicationImport
+            - practiceId
+        map:
+            dbfBank: fDbfBank
+            dbfBusinessName: fDbfBusinessName
+            dbfABI: fDbfABI
+            fFinancialDestination: fFinancialDestination
+            dfLoanProvidedAtImport: fDfLoanProvidedAtImport
+            dfAmount:
+                property: fDfAmount
+                callbacks:
+                    - stringToFloat
+            dfContractSignatureDate:
+                property: fDfContractSignatureDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dfResolutionDate:
+                property: fDfResolutionDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dfIssueDate:
+                property: fDfIssueDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dfDuration:
+                property: fDfDuration
+                callbacks:
+                    - stringToInt
+            dfPeriodicity: fDfPeriodicity
+            dfFirstDepreciationDeadline:
+                property: fDfFirstDepreciationDeadline
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dfPreDepreciationExists: fDfPreDepreciationExists
+            dfInstallmentAmount:
+                property: fDfInstallmentAmount
+                callbacks:
+                    - stringToFloat
+            tRateType: fTRateType
+            tRate:
+                property: fTRate
+                callbacks:
+                    - stringToFloat
+            tTaeg:
+                property: fTTaeg
+                callbacks:
+                    - stringToFloat
+    leasing:
+        entity: App\Entity\LeasingImport
+        criteria:
+            - applicationImport
+            - practiceId
+        map:
+            sfBankLeasing: lSfBankLeasing
+            sfBusinessName: lSfBusinessName
+            sfLeasingDestination: lSfLeasingDestination
+            dclAmount:
+                property: lDclAmount
+                callbacks:
+                    - stringToFloat
+            dclContractSignatureDate:
+                property: lDclContractSignatureDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dclResolutionDate:
+                property: lDclResolutionDate
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dclDuration:
+                property: lDclDuration
+                callbacks:
+                    - stringToInt
+            dclPeriodicity: lDclPeriodicity
+            dclFirstDeadline:
+                property: lDclFirstDeadline
+                callbacks:
+                    - [ 'stringToDateTime', [ 'd/m/Y' ] ]
+            dclFeeAmount:
+                property: lDclFeeAmount
+                callbacks:
+                    - stringToFloat
+            dclFeePercentage:
+                property: lDclFeePercentage
+                callbacks:
+                    - stringToFloat
+            dclRansomPercentage:
+                property: lDclRansomPercentage
+                callbacks:
+                    - stringToFloat
+            dclRate:
+                property: lDclRate
+                callbacks:
+                    - stringToFloat
+

@@ -1,0 +1,231 @@
+.accordion .card-body {
+    padding: 0;
+}
+
+.accordion .card-body .content-panel {
+    margin-bottom: 0;
+}
+
+.accordion .card-header button {
+    padding: 4px 0;
+}
+
+.upload-btn-wrapper {
+    display: flex;
+}
+
+.upload-btn-wrapper input[type="file"] {
+    display: inline-block;
+    width: 40%;
+}
+
+/*.upload-btn-wrapper {*/
+/*    position: relative;*/
+/*    overflow: hidden;*/
+/*    display: inline-block;*/
+/*}*/
+
+/*.upload-btn-wrapper .btn {*/
+/*    background: lightgrey;*/
+/*}*/
+
+/*.upload-btn-wrapper .custom-file {*/
+/*    position: absolute;*/
+/*    left: 0;*/
+/*    top: 0;*/
+/*    opacity: 0;*/
+/*}*/
+
+/*.btn-send-message {*/
+/*    position: relative;*/
+/*    top: -12px;*/
+/*    left: -4px;*/
+/*    background: var(--color-primary);*/
+/*    color: #ffffff;*/
+/*    box-shadow: none;*/
+/*    -webkit-box-shadow: none;*/
+/*    border-radius:*/
+/*        0*/
+/*        var(--border-radius)*/
+/*        var(--border-radius)*/
+/*        0;*/
+/*}*/
+
+/*.btn-send-message:hover {*/
+/*    color: #ffffff;*/
+/*}*/
+
+label.custom-file-label {
+     padding-right: 0 !important;
+}
+
+#upload-label {
+    height: 35px;
+    background-color: var(--primary-bg);
+}
+
+#btn-send-message {
+    width: 100px;
+    height: 33px;
+}
+
+.btn-save-draft-message {
+    border-radius: var(--border-radius);
+}
+
+.direct-chat-text {
+    min-height: 35px;
+}
+
+.direct-chat-timestamp.pull-right,
+.direct-chat-name.pull-left {
+    margin-right: 5px;
+}
+
+.direct-chat-text a {
+    color: #1356ff;
+    text-decoration: underline;
+}
+
+.direct-chat-text a:hover {
+    text-decoration: none;
+}
+
+.upload-btn {
+    border-radius:
+        var(--border-radius)
+        0
+        0
+        var(--border-radius);
+}
+
+.cke_editor_text {
+    margin:
+        0 0 15px 0 !important;
+}
+
+.cke_editor_text, .cke_inner {
+    border-radius: var(--border-radius);
+}
+
+.cke_top {
+    border-radius:
+        var(--border-radius)
+        var(--border-radius)
+        0
+        0;
+}
+
+.cke_bottom {
+    border-radius:
+        0
+        0
+        var(--border-radius)
+        var(--border-radius);
+}
+
+.form-widget input.form-control,
+.form-widget select.form-control,
+.form-widget textarea.form-control {
+    max-width: 400px;
+    width: 400px;
+}
+
+.btn-save-application-attachments {
+    border-radius: var(--border-radius);
+}
+
+.btn-save-application-attachments:hover {
+    border-color: transparent;
+}
+
+.form-widget-compound .form-group,
+.form-group {
+    display: block;
+}
+
+#applicationAttachments > .form-group {
+    border-bottom: 1px solid lightgrey;
+    margin-bottom: 20px;
+}
+
+.form-widget-compound>div>.form-group:last-child {
+    padding: 0 20px 15px 0;
+}
+
+#form-addition-contributions .form-check input[value="CFP"] {
+    margin-left:1.25em;
+}
+
+#form-addition-contributions .form-check {
+    margin-bottom: 5px;
+    padding-left: 0;
+}
+
+.file-upload-message {
+    padding: .280rem .75rem;
+}
+
+@media (min-width: 1024px) {
+    .form-widget {
+        padding-left: 0;
+    }
+
+    [data-ea-collection-field] .form-widget > :not(.ea-vich-field) * {
+        flex: unset;
+    }
+
+    .form-group label,
+    .form-group legend.col-form-label {
+        text-align: left;
+    }
+}
+
+/*.data-row.with-background {*/
+/*    display: flex;*/
+/*}*/
+
+#application_additional_contributions_focus {
+    position: relative;
+    top:-52px;
+}
+
+.icon-fa-app {
+    font-size: 18px
+}
+
+#application_attachments_focus {
+    position: relative;
+    top:-81px;
+}
+
+.div-orphan-with-margin {
+    margin: 4px 0
+}
+
+.btn-save-draft-message {
+    background-color: #cccccc;
+    color: #333
+}
+
+.data-row {
+    display: flex;
+}
+
+dl.datalist .data-row {
+    padding-top: 8px;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    border-bottom-color: #c6c6c6;
+}
+
+dl.datalist .data-row.with-background {
+}
+
+dl.datalist .data-row dd {
+    padding-left: 5px;
+    width: 160px;
+}
+
+dl.datalist .data-row dt {
+}

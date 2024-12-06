@@ -1,0 +1,24 @@
+trigger: 'none'
+
+variables:
+    - group: aws-config-prod
+    - group: liguria-gal-env-vars-production
+
+jobs:
+    - template: templates/reset-cache-symfony.yml
+    - job: ProcessResetCacheNSIA
+      pool: 'ArtigiancassaAWSPool'
+      displayName: 'Process Reset NSIA'
+      steps:
+      -  task: SystemsManagerRunCommand@1
+         inputs:
+           awsCredentials: '$(AWS_CREDENTIAL)'
+           regionName: '$(NSIA_AWS_REGION)'
+           documentName: 'AWS-RunShellScript'
+           documentParameters: '{"workingDirectory":["/var/app/current"],"executionTimeout":["3600"],"commands":["sudo -u webapp php bin/console cache:clear"]}'
+           instanceSelector: 'fromTags'
+           instanceTags: 'worker-nsia=gal'
+           maxConcurrency: '1'
+           maxErrors: '1'
+           outputS3BucketName: 'liguria-nsia-log-ssm-command'
+           outputS3KeyPrefix: 'gal'

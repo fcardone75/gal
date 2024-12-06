@@ -1,0 +1,24 @@
+###> symfony/framework-bundle ###
+/.env
+/.env.local
+/.env.local.php
+/.env.*.local
+/config/secrets/prod/prod.decrypt.private.php
+/public/bundles/
+/var/
+###< symfony/framework-bundle ###
+.idea
+.vscode
+.DS_Store
+/build
+!/build/.gitkeep
+*portale-liguria.zip
+.env.docker
+docker-compose.override.yml
+mysql-init
+.env
+auth.json
+###> symfony/phpunit-bridge ###
+.phpunit.result.cache
+/phpunit.xml
+###< symfony/phpunit-bridge ###

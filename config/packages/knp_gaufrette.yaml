@@ -1,0 +1,93 @@
+knp_gaufrette:
+    stream_wrapper: ~
+    adapters:
+        application_import_template_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_IMPORT_TEMPLATE_LOCAL_DIR)%'
+        application_import_template_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_import_template'
+        application_import_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_IMPORT_LOCAL_DIR)%'
+        application_import_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_import'
+        report_import_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_REPORT_IMPORT_LOCAL_DIR)%'
+        report_import_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'report_import'
+        application_nsia_xml_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_NSIA_XML_LOCAL_DIR)%'
+        application_nsia_xml_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_nsia_xml'
+        application_nsia_log_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_NSIA_LOG_LOCAL_DIR)%'
+        application_nsia_log_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_nsia_log'
+        application_message_attachment_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_MESSAGE_ATTACHMENT_LOCAL_DIR)%'
+        application_message_attachment_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_message_attachment'
+        application_group_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_GROUP_LOCAL_DIR)%'
+        application_group_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_group'
+        application_attachment_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_APPLICATION_ATTACHMENT_LOCAL_DIR)%'
+        application_attachment_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'application_attachment'
+        financing_provisioning_local:
+            local:
+                directory: '%kernel.project_dir%%env(GAUFRETTE_ADAPTER_FINANCING_PROVISIONING_LOCAL_DIR)%'
+        financing_provisioning_aws_s3:
+            aws_s3:
+                service_id: 'app.aws_s3.client'
+                bucket_name: '%env(resolve:AWS_S3_BUCKET)%'
+                detect_content_type: true
+                options:
+                    directory: 'financing_provisioning'

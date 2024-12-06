@@ -1,0 +1,352 @@
+pages:
+    login:
+        title: 'Portale Liguria'
+        links:
+            reset_password: 'Ho dimenticato la password'
+    reset_password:
+        page_title: 'Reset password'
+    update_password:
+        page_title: 'Aggiorna password'
+        page_description: 'Le tue credenziali sono scadute ed è necessario aggiornarle per poter accedere nuovamente'
+    welcome:
+        page_title: 'Benvenuto in Garanzia Artigianato Liguria'
+        page_description: ''
+    reset_password_request:
+        links:
+            login: 'Torna al login'
+
+crud:
+    settings: 'Impostazioni'
+    report_import:
+#        statuses:
+#            new: 'Creato'
+#            failed: 'Fallito'
+#            acquired: 'Acquisito'
+#            validation_failed: 'Non valido'
+#            validation_succeeded: 'Valido'
+#            imported: 'Completato'
+#            unknown: '-'
+        grid:
+            column_label:
+                year: 'Anno'
+                filename: 'File'
+                filename_file: 'File'
+                description: 'Descrizione'
+                created_at: 'Data'
+                created_by: 'Creato da'
+#                status: 'Status'
+#                errors: 'Errori'
+#                applications: 'Pratiche'
+        singular: Report
+        plural: Report
+#        flash_messages:
+#            xlsx_import:
+#                build_from_file:
+#                    success: 'L''importazione dal file excel è avvenuta con successo'
+        actions:
+#            new: 'Carica'
+            download: 'Scarica'
+#            download_template: 'Scarica report'
+        form:
+            import_xlsx:
+                xlsx_file: 'Xlsx file'
+                submit: 'Carica'
+        pages:
+            import:
+                title: 'Import report'
+
+    application:
+        plural: 'Pratiche'
+        singular: 'Pratica'
+        grid:
+            column_label:
+#                practice_web_id: 'Codice Pratica Web'
+#                practice_id: 'Codice Pratica Confidi'
+#                confidi: 'Ragione Sociale Confidi'
+                practice_web_id: 'Codice Web'
+                practice_id: 'Codice Confidi'
+                flag_energia: 'Energia'
+                confidi: 'Confidi'
+                nsia_id: 'Codice NSIA'
+#                ae_ib_business_name: 'Ragione Sociale Beneficiario'
+                ae_ib_business_name: 'Beneficiario'
+                status: 'Stato'
+                status_history: 'Storico status'
+                inquest_status: 'Stato Esterno'
+                financing_issue_date: 'Data erogazione finanziamento'
+                signature_contract_date: 'Data firma contratto'
+                nsia_nota: 'Nota NSIA'
+        actions:
+            set_inquest_status_closed: 'Chiudi Colloquio'
+            download_application_zip: 'Scarica Archivio'
+            download_application_csv: 'Esporta CSV'
+        pages:
+            detail:
+                fields:
+                    business_name: 'Ragione sociale'
+                    fiscal_code: 'Codice fiscale'
+                    pec: 'PEC'
+                    financing_data:
+                        type: 'Tipo'
+                        signature_contract_date: 'Data firma contratto'
+                        fdf_issue_date: 'Data erogazione'
+                        finality: 'Finalità'
+                        amount: 'Importo'
+                        months_duration: 'Durata mesi'
+                    confidi:
+                        amount_guarantee: 'Importo garantito'
+                        deliberation_date: 'Data delibera'
+                    practice:
+                        start_date: 'Data inizio'
+                        end_date: 'Data fine'
+                        status: 'Stato'
+                        inquest_status: 'Stato esterno'
+                        deliberate_date: 'Data delibera'
+                        reinsured_amount: 'Importo riassicurato'
+                        granted_esl: 'ESL concesso'
+                inquest_box:
+                    title: 'Colloquio Confidi'
+        modal_financing_provisioning_certification_upload:
+            title: 'Caricamento Attestazione Erogazione'
+            content: "Caricando il file l'attestazione erogazione verrà inviata.<br/>Questa azione è irreversibile."
+            actions:
+                cancel: 'Annulla'
+                confirm: 'Conferma'
+    application_group:
+        actions:
+            download_pdf: 'Scarica Domanda da firmare'
+            edit_with_different_label: 'Vedi'
+        applications_grid:
+            button:
+                add: 'Aggiungi'
+                remove: 'Rimuovi'
+                detail: 'Vedi'
+            column:
+                practice_id: 'Codice Pratica'
+                business_name: 'Ragione Sociale'
+                actions: 'Azioni'
+            linked:
+                title: 'Pratiche associate'
+            available:
+                title: 'Pratiche associabili'
+        plural: 'Domande'
+        singular: 'Domanda'
+        grid:
+            column_label:
+                protocol_number: 'N. Protocollo'
+                protocol_date: 'Data protocollo'
+                confidi: 'Confidi'
+                status: 'Stato'
+                filename: 'File'
+                filename_file: 'File firmato'
+                applications: 'Pratiche'
+        modal_protocol:
+            title: 'Protocollazione Domanda'
+            content: 'Caricando il file la Domanda verrà protocollata.<br/>Questa azione è irreversibile.'
+            actions:
+                cancel: 'Annulla'
+                confirm: 'Conferma'
+    users:
+        plural: 'Utenti'
+        singular: 'Utente'
+        grid:
+            column_label:
+                id: 'Id'
+                email: 'Email'
+                enabled: 'Abilitato'
+                last_login: 'Ultimo accesso'
+                update_password_token: 'Token aggiornamento password'
+                expires_at: 'Scadenza'
+                roles: 'Ruoli'
+                password: 'Password'
+                first_name: 'Nome'
+                last_name: 'Cognome'
+                full_name: 'Nome'
+                mobile_phone: 'Cellulare'
+                fiscal_id: 'C.F.'
+                birth: 'Data di nascita'
+                birth_country: 'Stato di nascita'
+                birth_region: 'Regione di nascita'
+                birth_province: 'Provincia di nascita'
+                birth_city: 'Città di nascita'
+                confidi: 'Confidi'
+            cell:
+                no_login: 'Nessun accesso'
+        actions:
+            import: 'Importa'
+            download_csv_template: 'Scarica template CSV'
+        form:
+            import_csv:
+                csv_file: 'File CSV'
+                submit: 'Carica'
+        pages:
+            import:
+                title: 'Import utenti'
+        csv_import:
+            errors:
+                columns_count: 'Il numero atteso di colonne è {expected}, la riga ne contiene {actual}'
+        flash_messages:
+            csv_import:
+                success: 'Importazione terminata. <strong>Totale righe</strong>: {total}, <strong>Utenti creati</strong>: {created}, <strong>Utenti aggiornati</strong>: {updated}, <strong>Errori</strong>: {errors}'
+    banks:
+        plural: Banche
+        singular: Banca
+        grid:
+            column_label:
+                id: Id
+                name: Nome
+                code: Codice
+                template: Template
+    banks_leasing:
+        plural: Banche/Soc. Leasing
+        singular: Banca/Soc. Leasing
+        grid:
+            column_label:
+                id: Id
+                name: Nome
+                code: Codice
+                template: Template
+    ateco_codes:
+        plural: Codici Ateco
+        singular: Codice Ateco
+        grid:
+            column_label:
+                id: Id
+                code: Codice
+                code_without_dots: Codice Senza Punti
+                description: Descrizione
+                section: Sezione
+    application_import:
+        statuses:
+            new: 'Creato'
+            failed: 'Fallito'
+            acquired: 'Acquisito'
+            validation_failed: 'Non valido'
+            validation_succeeded: 'Valido'
+            imported: 'Completato'
+            unknown: '-'
+        grid:
+            column_label:
+                filename: 'File'
+                filename_file: 'File'
+                confidi: 'Confidi'
+                created_at: 'Data'
+                created_by: 'Creato da'
+                status: 'Status'
+                errors: 'Errori'
+                applications: 'Pratiche'
+        singular: Import pratiche
+        plural: Import pratiche
+        flash_messages:
+            xlsx_import:
+                build_from_file:
+                    success: 'L''importazione dal file excel è avvenuta con successo'
+        actions:
+            download: 'Scarica'
+            download_template: 'Scarica template'
+        form:
+            import_xlsx:
+                xlsx_file: 'Xlsx file'
+                submit: 'Carica'
+        pages:
+            import:
+                title: 'Import pratiche'
+
+    application_import_template:
+        actions:
+            new: 'Nuovo import'
+            download: 'Scarica'
+        singular: Template import
+        plural: Template import
+        grid:
+            column_label:
+                filename: 'Nome file'
+                filename_file: 'File'
+                created_at: 'Data caricamento'
+                created_by: 'Caricato da'
+                active: 'Attivo'
+                revision: 'Numero revisione'
+        flash_messages:
+            xlsx_import:
+                build_from_file:
+                    success: 'L''importazione dal file excel è avvenuta con successo'
+        form:
+            placeholders:
+                revision: 'Es. 1 o 1.1'
+            import_xlsx:
+                xlsx_file: 'Xlsx file'
+                submit: 'Carica'
+        pages:
+            import:
+                title: 'Caricamento template di import'
+    confidi:
+        singular: 'Confidi'
+        plural: 'Confidi'
+        grid:
+            column_label:
+                business_name: 'Ragione Sociale'
+                legal_representative: 'Legale rappresentante'
+                iban: 'IBAN'
+                fiscal_code: 'Codice Fiscale'
+                nsia_code: 'Codice NSIA'
+
+
+flash_messages:
+    reset_password_request:
+        user_not_found: 'Non esiste nessun utente con email {email}'
+        success: 'È stata inviata un''email all''indirizzo specificato con le istruzioni per effettuare il reset della password. <a href="{login_url}">Torna al login</a>'
+    reset_password_reset:
+        success: 'La password è stata resettata con successo'
+    update_password:
+        success: 'Le credenziali sono state aggiornate con successo'
+    application_import:
+        import_failed: 'L''import delle pratiche non è andato a buon fine. Nel dettaglio è possibile visualizzare gli errori riscontrati in fase di import'
+        import_completed: 'L''import delle pratiche è stato completato con successo!'
+    attachment_inserted: 'Allegato inserito'
+
+security:
+    exception:
+        reset_password_already_requested: 'Il reset della password è già stato richiesto'
+        reset_password_token_not_found: 'Il token per il reset della password non è valido'
+    form:
+        reset_password_request:
+            submit: 'Invia'
+        reset_password:
+            new_password: 'Nuova password'
+            new_password_confirmation: 'Conferma password'
+            submit: 'Invia'
+        update_password:
+            current_password: 'Password attuale'
+            new_password: 'Nuova password'
+            new_password_confirmation: 'Conferma password'
+            submit: 'Aggiorna password'
+mail:
+    reset_password:
+        subject: 'Reset password'
+    application_message:
+        subject: 'Aggiornamento stato pratica {practiceId}'
+    user_created:
+        subject: 'Nuova utenza creata'
+    nsia_error_message:
+        subject: 'Errore elaborazione file NSIA'
+    fpc_notification:
+        subject: 'Pratica n. {application_number} - Caricamento attestazione erogazione'
+application_importer:
+    errors:
+        file:
+            missing_sheet: 'Nel file caricato non è presente il foglio "{sheet}"'
+            invalid_sheets_count: 'Il file contiene {sheetsCount} fogli, dovrebbe contenerne {expectedCount}'
+            no_valid_entities: 'Il file caricato non contiene alcun dato valido per l''importazione'
+            exception: 'L''import è stato interrotto a causa di un errore: {error}'
+            reset_row_start_failed: 'Non è stato possibile impostare la riga di partenza per l''import per il foglio {sheet}'
+        sheet:
+          unable_to_get_cell: 'Non è stato possibile leggere il contenuto della cella {cell} nel foglio {sheet}'
+          unable_to_read_row: 'Non è stato possibile leggere il contenuto della celle alla riga {row} del foglio "{sheet}" a causa di un errore: {error}'
+        row:
+            type_error: 'Si è verificato un errore durante l''import dei dati contenuti nella cella {cell} del foglio {sheet}. Errore: {error}'
+        validation: 'Foglio "{sheet}" -  Cella "{cell}": {error_message}'
+        import:
+            no_matched_entities: 'Non è stata trovato un dettaglio di Finanziamento o Leasing per la pratica "{practiceId}"'
+ABB: 'Richiesta abbuono'
+CON: 'Richiesta contributo INT/CAN'
+CFP: 'Fondo perduto'
