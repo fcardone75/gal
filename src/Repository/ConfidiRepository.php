@@ -38,64 +38,36 @@ class ConfidiRepository extends ServiceEntityRepository
 
         $qb = $this->createQueryBuilder('c');
 
-        $qb->join('c.applicationGroups', 'ag');
-        $qb->join('ag.applications', 'a');
-        $qb->leftJoin('a.additionalContributions', 'ac');
-        $qb->leftJoin('a.financingProvisioningCertification', 'fpc');
+        $qb->join('c.applicationGroups', 'ag')
+            ->join('ag.applications', 'a')
+            ->leftJoin('a.additionalContributions', 'ac')
+            ->leftJoin('a.financingProvisioningCertification', 'fpc');
 
         $qb->andWhere('ag.protocolNumber IS NOT NULL');
-/*
-        $qb->andWhere(
+
+// Construct the OR condition
+        $orCondition = $qb->expr()->orX(
+            $qb->expr()->isNull('a.registryFileAudit'),
             $qb->expr()->andX(
+                $qb->expr()->isNotNull('ac'),
+                $qb->expr()->isNull('ac.registryFileAudit'),
                 $qb->expr()->orX(
-                    $qb->expr()->isNull('a.registryFileAudit'),
-                    $qb->expr()->andX(
-                        $qb->expr()->isNotNull('ac.id'),
-                        $qb->expr()->isNull('ac.registryFileAudit'),
-                        $qb->expr()->orX(
-                            $qb->expr()->eq('ac.inImport', 0),
-                            $qb->expr()->isNull('ac.inImport')
-                        )
-                    )
-                ),
-                $qb->expr()->orX(
-//                    $qb->expr()->isNull('a.financingProvisioningCertification'),
-                    $qb->expr()->isNull('fpc'),
-                    $qb->expr()->andX(
-                        $qb->expr()->isNotNull('fpc.id'),
-                        $qb->expr()->isNull('fpc.registryFileAudit'),
-//                        $qb->expr()->eq('fpc.status', FinancingProvisioningCertification::STATUS_COMPLETED)
-                        $qb->expr()->eq('fpc.status', ':status')
-                    )
+                    $qb->expr()->eq('ac.inImport', ':false'),
+                    $qb->expr()->isNull('ac.inImport')
                 )
+            ),
+            $qb->expr()->andX(
+                $qb->expr()->isNotNull('fpc'),
+                $qb->expr()->isNull('fpc.registryFileAudit'),
+                $qb->expr()->eq('fpc.status', ':status')
             )
         );
-        $qb->setParameter('status', FinancingProvisioningCertification::STATUS_COMPLETED);
-*/
 
-        $qb->andWhere(
-//            $qb->expr()->andX(
-                $qb->expr()->orX(
-                    $qb->expr()->isNull('a.registryFileAudit'),
-                    $qb->expr()->andX(
-//                        $qb->expr()->isNotNull('ac.id'),
-                        $qb->expr()->isNotNull('ac'),
-                        $qb->expr()->isNull('ac.registryFileAudit'),
-                        $qb->expr()->orX(
-                            $qb->expr()->eq('ac.inImport', 0),
-                            $qb->expr()->isNull('ac.inImport')
-                        )
-                    ),
-                    $qb->expr()->andX(
-//                        $qb->expr()->isNotNull('fpc.id'),
-                        $qb->expr()->isNotNull('fpc'),
-                        $qb->expr()->isNull('fpc.registryFileAudit'),
-                        $qb->expr()->eq('fpc.status', ':status')
-                    )
-                )
-//            )
-        );
-        $qb->setParameter('status', FinancingProvisioningCertification::STATUS_COMPLETED);
+        $qb->andWhere($orCondition);
+
+// Set parameters
+        $qb->setParameter('status', FinancingProvisioningCertification::STATUS_COMPLETED)
+            ->setParameter('false', false);
 
         return $qb->getQuery()->getResult();
 

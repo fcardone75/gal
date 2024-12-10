@@ -83,7 +83,7 @@ class ApplicationRepository extends ServiceEntityRepository
                     $qb->expr()->isNotNull('ac'),
                     $qb->expr()->isNull('ac.registryFileAudit'),
                     $qb->expr()->orX(
-                        $qb->expr()->eq('ac.inImport', 0),
+                        $qb->expr()->eq('ac.inImport', false),
                         $qb->expr()->isNull('ac.inImport')
                     )
                 ),

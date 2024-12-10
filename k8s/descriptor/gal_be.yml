@@ -132,4 +132,5 @@ spec:
       BNI_GPEC_USER: test
       BNI_GPEC_PASSWORD: test
       GPEC_ENV_UP_FOLDER: "5"
-      
+      NSIA_IN_PATH: /../../../application_nsia_xml/INPUT
+      NSIA_OUT_PATH: /../../../application_nsia_xml/OUTPUT

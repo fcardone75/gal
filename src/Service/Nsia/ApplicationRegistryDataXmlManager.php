@@ -119,7 +119,8 @@ class ApplicationRegistryDataXmlManager
             ['formatOutput' => true]
         );
 
-		fputs ($fileXmlSource, $data);
+        file_put_contents($fileXmlSource, $data);
+//		fputs ($fileXmlSource, $data);
     }
 
 

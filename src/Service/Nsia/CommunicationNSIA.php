@@ -11,14 +11,15 @@ use App\Entity\RegistryFileAudit;
 use App\Service\Contracts\MailerInterface;
 use App\Service\ServerSFTP;
 use DateTime;
-
 use Doctrine\ORM\EntityManagerInterface;
+use Gaufrette\FilesystemInterface;
 use Knp\Bundle\GaufretteBundle\FilesystemMap;
 use Psr\Log\LoggerInterface;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
-use Symfony\Component\Filesystem\Filesystem;
+use function Psl\Filesystem\get_filename;
 
 
 class CommunicationNSIA
@@ -57,14 +58,14 @@ class CommunicationNSIA
     private $filesystemMap;
 
     /**
-	 * @var LoggerInterface
-	 */
-	private $logger;
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
-	 * @var MailerInterface
-	 */
-	private $mailer;
+     * @var MailerInterface
+     */
+    private $mailer;
 
     /**
      * @var string
@@ -87,38 +88,38 @@ class CommunicationNSIA
      * @param EntityManagerInterface $entityManager
      * @param ServerSFTP $serverSFTP
      * @param ApplicationRegistryDataXmlManager $applicationRegistryDataXmlManager
-	 * @param FilesystemMap $filesystemMap
-	 * @param LoggerInterface $logger
-	 * @param MailerInterface $mailer
-	 * @param string $basePath
-	 * @param bool $ftpEnabled
-	 * @param string $ftpEnvironment
+     * @param FilesystemMap $filesystemMap
+     * @param LoggerInterface $logger
+     * @param MailerInterface $mailer
+     * @param string $basePath
+     * @param bool $ftpEnabled
+     * @param string $ftpEnvironment
      */
-    public function __construct(EntityManagerInterface $entityManager,
-								ServerSFTP $serverSFTP,
-								ApplicationRegistryDataXmlManager $applicationRegistryDataXmlManager,
-								FilesystemMap $filesystemMap,
-								LoggerInterface $logger,
-								MailerInterface $mailer,
-                                string $basePath,
-                                bool $ftpEnabled,
-                                string $ftpEnvironment
-	)
+    public function __construct(EntityManagerInterface            $entityManager,
+                                ServerSFTP                        $serverSFTP,
+                                ApplicationRegistryDataXmlManager $applicationRegistryDataXmlManager,
+                                FilesystemMap                     $filesystemMap,
+                                LoggerInterface                   $logger,
+                                MailerInterface                   $mailer,
+                                string                            $basePath,
+                                bool                              $ftpEnabled,
+                                string                            $ftpEnvironment
+    )
     {
         $this->entityManager = $entityManager;
         $this->serverSFTP = $serverSFTP;
         $this->applicationRegistryDataXmlManager = $applicationRegistryDataXmlManager;
         $this->filesystemMap = $filesystemMap;
-		$this->logger = $logger;
-		$this->mailer = $mailer;
-		$this->basePath = $basePath;
-		$this->ftpEnabled = $ftpEnabled;
-		$this->ftpEnvironment = $ftpEnvironment;
+        $this->logger = $logger;
+        $this->mailer = $mailer;
+        $this->basePath = $basePath;
+        $this->ftpEnabled = $ftpEnabled;
+        $this->ftpEnvironment = $ftpEnvironment;
 
-		error_reporting(1);
-		set_time_limit (1200);
+        error_reporting(1);
+        set_time_limit(1200);
 //		ini_set('memory_limit', '2048M');
-	}
+    }
 
     /**
      * @throws NotAcceptableHttpException
@@ -127,104 +128,98 @@ class CommunicationNSIA
     {
         $fileType = RegistryFileAudit::TYPE_LIGDO;
         $dir = self::DIR_XML_OUT;
-        $dirPath = $this->verifyFtpPathByEnv($dir);
+        $dirPath = realpath(__DIR__ . $_ENV['NSIA_OUT_PATH']);
 
-        $message = 'CommunicationNSIA->sendDataXMLToNSIA - START (ftpEnabled: ' . $this->ftpEnabled . ', ftpEnvironment: ' . $this->ftpEnvironment .', $dirPath: '. $dirPath .')';
+
+        $message = 'CommunicationNSIA->sendDataXMLToNSIA - START (ftpEnabled: ' . $this->ftpEnabled . ', ftpEnvironment: ' . $this->ftpEnvironment . ', $dirPath: ' . $dirPath . ')';
         $this->logger->info($message);
         if (null !== $output) {
             $output->writeln($message);
         }
 //dd($message);
 
-		if ($this->ftpEnabled) {
-            $this->serverSFTP->connectToServer();
-//TODO: creo file xml (verificare nomina file)
-			$result = $this->manageFileXmlByType($fileType, $dirPath);
 
-			$fileXmlTemp = $result['fileXml'] ?? null;
-            $filenameTmp = $result['filename'] ?? null;
+        $result = $this->manageFileXmlByType($fileType, $dirPath);
+
+        $fileXmlTemp = $result['fileXml'] ?? null;
+        $filenameTmp = $result['filename'] ?? null;
 
 //TODO: compilo xml con dati application + callback
-			$this->applicationRegistryDataXmlManager->setDataToXmlApplicationRegistry($fileXmlTemp, $this->newProgressiveNumber);
+        $this->applicationRegistryDataXmlManager->setDataToXmlApplicationRegistry($fileXmlTemp, $this->newProgressiveNumber);
 
-            $message = 'setDataToXmlApplicationRegistry';
-            $this->logger->info($message);
-            if (null !== $output) {
-                $output->writeln($message);
-            }
+        $message = 'setDataToXmlApplicationRegistry';
+        $this->logger->info($message);
+        if (null !== $output) {
+            $output->writeln($message);
+        }
 
-            $registryFileAudit = null;
-			foreach ($this->callbackFunctionsManageFileToServer as $callbackFunction) {
-                $registryFileAudit = call_user_func($callbackFunction);
+        $registryFileAudit = null;
+        foreach ($this->callbackFunctionsManageFileToServer as $callbackFunction) {
+            $registryFileAudit = call_user_func($callbackFunction);
 //                dd($registryFileAudit);
-			}
+        }
 
-			$this->callbackFunctionsManageFileToServer = [];
+        $this->callbackFunctionsManageFileToServer = [];
 
 //TODO: verificare logica associazione con registry file audit per application e additional contribution
 // eseguo di nuovo le query o metodo ad hoc nel repository?
 
 // solo confidi che hanno qualcosa da inviare
-            $criteria = [];
-            $confidiList = $this->entityManager->getRepository(Confidi::class)->findAllForNsia($criteria);
+        $criteria = [];
+        $confidiList = $this->entityManager->getRepository(Confidi::class)->findAllForNsia($criteria);
 //dd(count($confidiList));
 
-            foreach($confidiList as $confidi) {
+        foreach ($confidiList as $confidi) {
 
-                // solo applicationGroup con application o additional contribution non ancora inviate
-                $criteria = [];
-                $criteria['confidi'] = $confidi;
-                $applicationGroupList = $this->entityManager->getRepository(ApplicationGroup::class)->findAllForNsia($criteria);
+            // solo applicationGroup con application o additional contribution non ancora inviate
+            $criteria = [];
+            $criteria['confidi'] = $confidi;
+            $applicationGroupList = $this->entityManager->getRepository(ApplicationGroup::class)->findAllForNsia($criteria);
 
-                foreach ($applicationGroupList as $applicationGroup) {
+            foreach ($applicationGroupList as $applicationGroup) {
 
-                    // associo file generato
-                    if ($applicationGroup->getStatus() == ApplicationGroup::STATUS_REGISTERED && empty($applicationGroup->getRegistryFileAudit())) {
-                        $applicationGroup->setStatus(ApplicationGroup::STATUS_SENT_TO_NSIA);
-                        $applicationGroup->setRegistryFileAudit($registryFileAudit);
-                    }
+                // associo file generato
+                if ($applicationGroup->getStatus() == ApplicationGroup::STATUS_REGISTERED && empty($applicationGroup->getRegistryFileAudit())) {
+                    $applicationGroup->setStatus(ApplicationGroup::STATUS_SENT_TO_NSIA);
+                    $applicationGroup->setRegistryFileAudit($registryFileAudit);
+                }
 
 //TODO: verificare logiche selezione
 // elenco di application del confidi non ancora inviate (application e/o relative richieste contributo aggiuntive)
 //TODO: check criteria
-                    $criteria = [];
-                    $criteria['applicationGroup'] = $applicationGroup;
-                    $applicationList = $this->entityManager->getRepository(Application::class)->findAllForNsia($criteria);
+                $criteria = [];
+                $criteria['applicationGroup'] = $applicationGroup;
+                $applicationList = $this->entityManager->getRepository(Application::class)->findAllForNsia($criteria);
 //dd(count($applicationList));
-                    foreach ($applicationList as $application) {
+                foreach ($applicationList as $application) {
 // associo file generato
-                        if (empty($application->getRegistryFileAudit())) {
-                            $application->setRegistryFileAudit($registryFileAudit);
-                        }
+                    if (empty($application->getRegistryFileAudit())) {
+                        $application->setRegistryFileAudit($registryFileAudit);
+                    }
 
 // associo file generato
-                        if (!empty($application->getFinancingProvisioningCertification()) && empty($application->getFinancingProvisioningCertification()->getRegistryFileAudit())) {
-                            $application->getFinancingProvisioningCertification()->setRegistryFileAudit($registryFileAudit);
-                        }
+                    if (!empty($application->getFinancingProvisioningCertification()) && empty($application->getFinancingProvisioningCertification()->getRegistryFileAudit())) {
+                        $application->getFinancingProvisioningCertification()->setRegistryFileAudit($registryFileAudit);
+                    }
 
-                        $criteria = [];
-                        $criteria['application'] = $application;
-                        $additionalContributionList = $this->entityManager->getRepository(AdditionalContribution::class)->findAllForNsia($criteria);
+                    $criteria = [];
+                    $criteria['application'] = $application;
+                    $additionalContributionList = $this->entityManager->getRepository(AdditionalContribution::class)->findAllForNsia($criteria);
 
-                        foreach ($additionalContributionList as $additionalContribution) {
+                    foreach ($additionalContributionList as $additionalContribution) {
 // associo file generato
-                            $additionalContribution->setRegistryFileAudit($registryFileAudit);
-                        }
+                        $additionalContribution->setRegistryFileAudit($registryFileAudit);
                     }
                 }
             }
+        }
 //die;
-			$this->entityManager->flush();
+        $this->entityManager->flush();
 
-            $message = 'CommunicationNSIA->sendDataXMLToNSIA - END';
-            $this->logger->info($message);
-            if (null !== $output) {
-                $output->writeln($message);
-            }
-        } else {
-            $message = 'ERROR: FTP config not enabled';
-            $this->logger->info($message);
-            $this->notifyError($message);
+        $message = 'CommunicationNSIA->sendDataXMLToNSIA - END';
+        $this->logger->info($message);
+        if (null !== $output) {
+            $output->writeln($message);
         }
     }
 
@@ -235,123 +230,116 @@ class CommunicationNSIA
     {
         $fileType = RegistryFileAudit::TYPE_LIGREND;
         $dir = self::DIR_XML_IN;
-        $dirPath = $this->verifyFtpPathByEnv($dir);
-
-        $message = 'CommunicationNSIA->getDataFilesFromNSIA - START (ftpEnabled: ' . $this->ftpEnabled . ', ftpEnvironment: ' .$this->ftpEnvironment .', $dirPath: '. $dirPath .')';
+        $dir = $this->verifyFtpPathByEnv($dir);
+        $dirPath=realpath(__DIR__.$_ENV['NSIA_IN_PATH'].'/'.$dir);
+        $dirPathOutput = realpath(__DIR__ .$_ENV['NSIA_OUT_PATH']);
+        $message = 'CommunicationNSIA->getDataFilesFromNSIA - START (ftpEnabled: ' . $this->ftpEnabled . ', ftpEnvironment: ' . $this->ftpEnvironment . ', $dirPath: ' . $dirPath . ')';
         $this->logger->info($message);
         if (null !== $output) {
             $output->writeln($message);
         }
-		if ($this->ftpEnabled) {
-            $this->serverSFTP->connectToServer();
-			if($this->serverSFTP->file_exists($dirPath)) {
-				$files = $this->serverSFTP->nlist($dirPath, true);
 
-				foreach ($files as $file) {
-					if ($file == '.' || $file == '..') {
-						continue;
-					}
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS)) as $file) {
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
 
-					if (strpos($file, $fileType.'_') === false) {
-						continue;
-					}
+            if (strpos($file, $fileType . '_') === false) {
+                continue;
+            }
 
-//TODO: copy file from NSIA to local dir (or s3)
-                    if (!$this->filesystemMap->has('application_nsia_xml')) {
-                        $message = 'ERROR: File system not found (application_nsia_xml)';
-                        $this->logger->info($message);
-                        $this->notifyError($message);
-					}
 
-                    $fileSystem = $this->filesystemMap->get('application_nsia_xml');
+            $fileContent = file_get_contents($file);
 
-					$fileContent = $this->serverSFTP->get($dirPath.$file);
+            $this->logger->critical("OUTPUT: $dirPath" . get_filename($file));
+            file_put_contents($dirPathOutput . '/' . get_filename($file), $fileContent, true);
 
-					$fileSystem->write($dirPath.$file,$fileContent,true);
+            $message = 'fileSystem->write: ' . $dirPath . $file;
+            $this->logger->info($message);
+            if (null !== $output) {
+                $output->writeln($message);
+            }
+        }
 
-					$message = 'fileSystem->write: '. $dirPath.$file;
-                    $this->logger->info($message);
-                    if (null !== $output) {
-                        $output->writeln($message);
-                    }
-				}
+        $message = 'END getDataFilesFromNSIA';
+        $this->logger->info($message);
+        if (null !== $output) {
+            $output->writeln($message);
+        }
+    }
 
-				$message = 'END getDataFilesFromNSIA';
+    private function processDirectory(string $dirPath, string $fileType, FilesystemInterface $fileSystem, ?OutputInterface $output): void
+    {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::SELF_FIRST
+        );
+
+        foreach ($iterator as $file) {
+            if ($file->isFile() && strpos($file->getFilename(), $fileType . '_') !== false) {
+                $relativePath = substr($file->getPathname(), strlen($dirPath));
+                $fileContent = file_get_contents($file->getPathname());
+                $fileSystem->write($relativePath, $fileContent, true);
+
+                $message = 'fileSystem->write: ' . $relativePath;
                 $this->logger->info($message);
                 if (null !== $output) {
                     $output->writeln($message);
                 }
-			} else {
-                $message = 'ERROR: FTP directory not found ('.$dirPath.')';
-                $this->logger->info($message);
-                $this->notifyError($message);
-			}
-		} else {
-            $message = 'ERROR: FTP config not enabled';
-            $this->logger->info($message);
-            $this->notifyError($message);
+            }
         }
     }
+
 
     /**
      * @throws NotAcceptableHttpException
      */
-	public function parseDataFilesNSIA(OutputInterface $output = null): void
-	{
+    public function parseDataFilesNSIA(OutputInterface $output = null): void
+    {
         $fileType = RegistryFileAudit::TYPE_LIGREND;
-        $dir = self::DIR_XML_IN;
-        $dirPath = $this->verifyFtpPathByEnv($dir);
-//dd($dirPath);
+        $dirPath = realpath(__DIR__ . $_ENV['NSIA_OUT_PATH']);
+        $dirPathTo = $dirPath . '/Elaborati/';
 
-        if (!$this->filesystemMap->has('application_nsia_xml')) {
-            $message = 'ERROR: File system not found (application_nsia_xml)';
-            $this->logger->info($message);
-            $this->notifyError($message);
-        }
-
-        $fileSystem = $this->filesystemMap->get('application_nsia_xml');
-//print_r($fileSystem);die;
-
-        $dirPathTo = $dirPath . 'Elaborati/';
-
-        $message = 'CommunicationNSIA->parseDataFilesNSIA - START (ftpEnabled: ' . $this->ftpEnabled . ', ftpEnvironment: ' .$this->ftpEnvironment .', $dirPath: '. $dirPath .', $dirPathTo: '. $dirPathTo .')';
+        $message = 'CommunicationNSIA->parseDataFilesNSIA - START (dirPath: ' . $dirPath . ', dirPathTo: ' . $dirPathTo . ')';
         $this->logger->info($message);
         if (null !== $output) {
             $output->writeln($message);
         }
-//dd($message);
-
-		if ($this->ftpEnabled) {
-            $this->serverSFTP->connectToServer();
-			$prefix = $dirPath . $fileType.'_';
-			$files = $fileSystem->listKeys($prefix);
-//dd($files);
-
-// adapter s3 restituisce solo elenco file, no keys/dirs
-			$files_list = isset($files['keys']) ? $files['keys'] : $files;
-//dd($files_list);
-			if (!$this->serverSFTP->file_exists($dirPathTo)) {
-				$this->serverSFTP->mkdir($dirPathTo);
-			}
 
 
-//TODO: elenco status x ciascuna entity
+        try {
+            // Create Elaborati directory if it doesn't exist
+            if (!file_exists($dirPathTo)) {
+                mkdir($dirPathTo, 0777, true);
+            }
+
+            // TODO: elenco status x ciascuna entity
             $application_status_map = Application::$statusesNsiaMap;
             $additional_contribution_status_map = AdditionalContribution::$statusesNsiaMap;
-//dd($application_status_map, $additional_contribution_status_map)
 
+            // Recursively iterate through all files in the directory
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dirPath, RecursiveDirectoryIterator::SKIP_DOTS)
+            );
 
-//TODO: in teoria dovrebbe esserci un solo file per volta
-            foreach ($files_list as $file_name_with_path) {
-                $file_path_parts = explode('/', $file_name_with_path);
-                $file_name = array_pop($file_path_parts);
+            foreach ($iterator as $file) {
+                // Skip if it's not a file or if it's in the Elaborati directory
+                if (!$file->isFile() || strpos($file->getPathname(), $dirPathTo) !== false) {
+                    continue;
+                }
 
-				$message = 'parse $file_name: ' . $file_name;
-				$this->logger->info($message);
-//print_r($message . "\n");
+                $file_name = $file->getBasename();
+                // Skip if filename doesn't match the required pattern
+                if (strpos($file_name, $fileType . '_') === false) {
+                    continue;
+                }
 
+                $this->logger->critical("FILE PRESO: $file");
 
-//TODO: check nome file (numerazione coerente rispetto ad ultimo file elaborato): se la numerazione non è coerente invio mail notifica
+                $message = 'parse $file_name: ' . $file_name;
+                $this->logger->info($message);
+
+                // TODO: check nome file (numerazione coerente rispetto ad ultimo file elaborato)
                 $criteria = [];
                 $criteria['type'] = $fileType;
 
@@ -359,35 +347,79 @@ class CommunicationNSIA
                 $order['progressiveNumber'] = 'DESC';
 
                 $lastRegistryFileAudit = $this->entityManager->getRepository(RegistryFileAudit::class)->findOneBy($criteria, $order);
-
                 $newProgressiveNumber = $lastRegistryFileAudit ? $lastRegistryFileAudit->getProgressiveNumber() + 1 : 1;
                 $newProgressiveNumber = $this->formatFieldNumber($newProgressiveNumber, 4);
                 $file_name_parts = explode('_', $file_name);
-                if (empty($file_name_parts[1]) || (!empty($file_name_parts[1]) && $this->formatFieldNumber($newProgressiveNumber, 4) != ($file_name_parts[1]))) {
-                    $message = 'ERROR: il file inviato ('.$file_name.') non ha il progressive number atteso ('.$newProgressiveNumber.')';
+
+// Debug logging to understand the values
+                $message = 'Debug - File name parts: ' . print_r($file_name_parts, true) .
+                    ', Expected number: ' . $newProgressiveNumber;
+                $this->logger->info($message);
+
+// First, check if we have enough parts in the filename
+                if (count($file_name_parts) < 2) {
+                    $message = 'ERROR: Invalid file name format (' . $file_name . ')';
                     $this->logger->info($message);
                     $this->notifyError($message);
+                    continue;
                 }
 
-// leggo file xml ritorno NSIA
-//dd($file_name_with_path);
-				$fileContent = $this->serverSFTP->get($file_name_with_path);
-//dd($fileContent);
-				if (empty($fileContent)) {
-					$message = 'ERROR: $file_name empty (' . $file_name . ')';
-					$this->logger->info($message);
-                    $this->notifyError($message);
-				}
+                // TODO CAMBIATO DA 1 a 4
+                $fileProgressiveNumber = $file_name_parts[2];
 
-// Convert xml string into an object
-				$string_tmp = simplexml_load_string($fileContent);
+// Add debug logging for the comparison
+                $message = 'Debug - Comparing file number: ' . $fileProgressiveNumber .
+                    ' with expected number: ' . $newProgressiveNumber;
+                $this->logger->info($message);
+
+// If there's no last audit record, accept any properly formatted number
+                if (!$lastRegistryFileAudit) {
+                    // Verify that the number is properly formatted (4 digits)
+
+                    $this->logger->critical("format: $fileProgressiveNumber");
+
+                    if (!preg_match('/^\d{4}$/', $fileProgressiveNumber)) {
+                        $message = 'ERROR: Invalid progressive number format in file (' . $file_name . ')';
+                        $this->logger->info($message);
+                        $this->notifyError($message);
+                        continue;
+                    }
+
+                } else {
+                    // TODO decommentare
+                    // If we have a last audit record, verify the number is the expected one
+                    if ($fileProgressiveNumber !== $newProgressiveNumber) {
+                        $message = 'ERROR: il file inviato (' . $file_name . ') non ha il progressive number atteso (' . $newProgressiveNumber . ')';
+                        $this->logger->info($message);
+                        $this->notifyError($message);
+                        continue;
+                    }
+                }
+
+                // Read file content
+                $fileContent = file_get_contents($file);
+                if (empty($fileContent)) {
+                    $message = 'ERROR: $file_name empty (' . $file_name . ')';
+                    $this->logger->info($message);
+                    $this->notifyError($message);
+                    continue;
+                }
+
+                // SOME CODE WE DO NOT NEED START
+
+                // Convert xml string into an object
+                //TODO: commentato
+//                $string_tmp = simplexml_load_string($fileContent);
+
 // Convert into json
-				$json_tmp = json_encode($string_tmp);
+                //TODO: commentato
+//                $json_tmp = json_encode($string_tmp);
+
 // Convert into associative array
-				$data_tmp = json_decode($json_tmp, true);
+                $data_tmp = json_decode($fileContent, true);
 //dd($data_tmp);
                 $confidi_NSIA_counter = $data_tmp['@attributes']['NumeroConfidi'] ?? 0;
-				$confidi_NSIA = $data_tmp['Confidi'] ?? [];
+                $confidi_NSIA = $data_tmp['Confidi'] ?? [];
                 if ($confidi_NSIA_counter && empty($confidi_NSIA)) {
                     $message = 'ERROR $confidi_NSIA empty';
                     $this->logger->info($message);
@@ -407,7 +439,7 @@ class CommunicationNSIA
 
 //TODO: check confidi exist: se non esiste invio mail notifica
                     if (empty($confidiCtrl)) {
-                        $message = 'ERROR $confidiCtrl empty (nsiaCode: '.$CodiceNSIA.')';
+                        $message = 'ERROR $confidiCtrl empty (nsiaCode: ' . $CodiceNSIA . ')';
                         $this->logger->info($message);
                         $this->notifyError($message);
                     }
@@ -463,9 +495,14 @@ class CommunicationNSIA
                     $riassicurazione_list = $this->checkArrayFormat($riassicurazione_NSIA, 'CodicePraticaWEB');
 
 //TODO: check coerenza dati riassicurazioni: se il totale non è coerente invio mail notifica
+
                     $NumeroRiassicurazioniCtrl = count($riassicurazione_list);
+
+                    $this->logger->critical("Riassicurzioni: " . $NumeroRiassicurazioni);
+                    $this->logger->critical("RiassicurzioniCtrl: " . $NumeroRiassicurazioniCtrl);
+
                     if ($NumeroRiassicurazioni != $NumeroRiassicurazioniCtrl) {
-                        $message = 'ERROR $NumeroRiassicurazioni ('.$NumeroRiassicurazioni.') non corrisponde numero $riassicurazione_NSIA ('.$NumeroRiassicurazioniCtrl.')';
+                        $message = 'ERROR $NumeroRiassicurazioni (' . $NumeroRiassicurazioni . ') non corrisponde numero $riassicurazione_NSIA (' . $NumeroRiassicurazioniCtrl . ')';
                         $this->logger->info($message);
                         $this->notifyError($message);
                     }
@@ -476,11 +513,12 @@ class CommunicationNSIA
 
                         $criteria = [];
                         $criteria['id'] = $CodicePraticaWEB;
+                        $this->logger->critical("Crit appl ctrl: " . json_encode($criteria));
                         $applicationCtrl = $this->entityManager->getRepository(Application::class)->findOneBy($criteria);
 
 //TODO: check application exist: se non esiste invio mail notifica
                         if (empty($applicationCtrl)) {
-                            $message = 'ERROR $applicationCtrl empty (id: '.$CodicePraticaWEB.')';
+                            $message = 'ERROR $applicationCtrl empty (id: ' . $CodicePraticaWEB . ')';
                             $this->logger->info($message);
                             $this->notifyError($message);
                         }
@@ -512,7 +550,7 @@ class CommunicationNSIA
                         if ($CodiceStato !== null) {
                             $status = $application_status_map[$CodiceStato]['status'];
                             if (!$status) {
-                                $message = 'ERROR $application $CodiceStato non previsto ('.$CodiceStato.')';
+                                $message = 'ERROR $application $CodiceStato non previsto (' . $CodiceStato . ')';
                                 $this->logger->info($message);
                                 $this->notifyError($message);
                             }
@@ -754,17 +792,17 @@ class CommunicationNSIA
 //<xs:element name="DurataGaranzia" type="xs:short" />
                         $DurataGaranzia = $riassicurazione['DurataGaranzia'] ?? null;
                         if ($DurataGaranzia !== null) {
-                          $applicationCtrl->setNsiaDurataGaranzia($DurataGaranzia);
+                            $applicationCtrl->setNsiaDurataGaranzia($DurataGaranzia);
                         }
 //<xs:element name="ImportoRiassicurazione" type="Importo" />
                         $ImportoRiassicurazione = $riassicurazione['ImportoRiassicurazione'] ?? null;
                         if ($ImportoRiassicurazione !== null) {
-                          $applicationCtrl->setNsiaImportoRiassicurazione($ImportoRiassicurazione);
+                            $applicationCtrl->setNsiaImportoRiassicurazione($ImportoRiassicurazione);
                         }
 //<xs:element name="ESLRiassicurazione" type="Importo" />
                         $ESLRiassicurazione = $riassicurazione['ESLRiassicurazione'] ?? null;
                         if ($ESLRiassicurazione !== null) {
-                          $applicationCtrl->setNsiaEslRiassicurazione($ESLRiassicurazione);
+                            $applicationCtrl->setNsiaEslRiassicurazione($ESLRiassicurazione);
                         }
 //<xs:element name="DataInizioGaranzia" type="xs:date" />
                         $DataInizioGaranzia = $riassicurazione['DataInizioGaranzia'] ?? null;
@@ -863,7 +901,7 @@ class CommunicationNSIA
 
 //TODO: check coerenza dati contributi aggiuntivi: se il totale non è coerente invio mail notifica
                         if ($NumeroContributiAggiuntivi != $NumeroContributiAggiuntiviCtrl) {
-                            $message = 'ERROR $NumeroContributiAggiuntivi ('.$NumeroContributiAggiuntivi.') non corrisponde numero $contributo_aggiuntivo_NSIA ('.$NumeroContributiAggiuntiviCtrl.')';
+                            $message = 'ERROR $NumeroContributiAggiuntivi (' . $NumeroContributiAggiuntivi . ') non corrisponde numero $contributo_aggiuntivo_NSIA (' . $NumeroContributiAggiuntiviCtrl . ')';
                             $this->logger->info($message);
                             $this->notifyError($message);
                         }
@@ -878,6 +916,7 @@ class CommunicationNSIA
                             $criteria = [];
                             $criteria['application'] = $applicationCtrl->getId();
                             $criteria['type'] = $TipoContributo;
+                            $this->logger->critical("add cont crit " . json_encode($criteria));
                             $additionalContributionCtrl = $this->entityManager->getRepository(AdditionalContribution::class)->findOneBy($criteria);
 //print_r($criteria);
 // mantis 0009906: LIGUARIA GAL & CCL - Richiesta sviluppo componente conto capitale
@@ -923,7 +962,7 @@ class CommunicationNSIA
                             if ($CodiceStato !== null) {
                                 $status = $additional_contribution_status_map[$CodiceStato]['status'];
                                 if (!$status) {
-                                    $message = 'ERROR $additionalContribution $CodiceStato non previsto ('.$CodiceStato.')';
+                                    $message = 'ERROR $additionalContribution $CodiceStato non previsto (' . $CodiceStato . ')';
                                     $this->logger->info($message);
                                     $this->notifyError($message);
                                 }
@@ -979,7 +1018,7 @@ class CommunicationNSIA
                             $revoca_NSIA = $contributo_aggiuntivo['Revoca'] ?? [];
 
 //TODO: verificare se esiste un solo nodo non viene letto come array di elementi
-                        $revoca_list = $this->checkArrayFormat($revoca_NSIA, 'DataRevoca');
+                            $revoca_list = $this->checkArrayFormat($revoca_NSIA, 'DataRevoca');
 
 //TODO: check coerenza dati revoca: se il totale non è coerente invio mail notifica
                             if (count($revoca_list) > 1) {
@@ -1046,7 +1085,7 @@ class CommunicationNSIA
                             }
 
 // mantis 0009906: LIGUARIA GAL & CCL - Richiesta sviluppo componente conto capitale
-                            if(!$additionalContributionCtrl->getId()) {
+                            if (!$additionalContributionCtrl->getId()) {
                                 $this->entityManager->persist($additionalContributionCtrl);
                                 $applicationCtrl->addAdditionalContribution($additionalContributionCtrl);
                             }
@@ -1121,32 +1160,29 @@ class CommunicationNSIA
                 $registryFileAudit
                     ->setFileName($file_name)
                     ->setProgressiveNumber($newProgressiveNumber)
-                    ->setType($fileType)
-                ;
+                    ->setType($fileType);
                 $this->entityManager->persist($registryFileAudit);
 //dd($registryFileAudit);
 //                die();
                 $this->entityManager->flush();
 //dd($dirPath, $dirPathTo, $file_name_with_path);
-                $file_name_with_path_new = str_replace($dirPath, $dirPathTo, $file_name_with_path);
+//                $file_name_with_path_new = str_replace($dirPath, $dirPathTo, $file_name_with_path);
 //dd($dirPath, $dirPathTo, $file_name_with_path, $file_name_with_path_new);
+                // SOME CODE WE DO NOT NEED END
 
-                // sposto file su ftp elaborati
-                $this->serverSFTP->rename($file_name_with_path, $file_name_with_path_new);
-                $message = 'serverSFTP->rename: ' . $file_name_with_path . ' -> ' . $file_name_with_path_new;
-                $this->logger->info($message);
+                // Move file to Elaborati directory
+                $file_name_with_path_new = $dirPathTo . $file_name;
 
-                //				$fileContent = $this->serverSFTP->get($file_name);
-                //				$this->serverSFTP->put($file_name_new, $fileContent);
-                //$message = 'serverSFTP->put: '. $file_name_new;
-                //$this->logger->info($message);
-                //				$this->serverSFTP->delete($file_name);
-                //$message = 'serverSFTP->delete: '. $file_name;
-                //$this->logger->info($message);
-
-                // sposto file su local dir (s3) elaborati
-                $fileSystem->rename($file_name_with_path, $file_name_with_path_new);
-                $message = 'fileSystem->rename: ' . $file_name_with_path . ' -> ' . $file_name_with_path_new;
+                $this->logger->critical("NOME FILE: $file");
+                $this->logger->critical("RINOMINA IN $file_name_with_path_new");
+                file_put_contents($file_name_with_path_new, file_get_contents($file));
+//                if (!rename($file, $file_name_with_path_new)) {
+//                    $message = 'ERROR: Failed to move file to Elaborati directory';
+//                    $this->logger->error($message);
+//                    $this->notifyError($message);
+//                    continue;
+//                }
+                $message = 'File moved: ' . $file . ' -> ' . $file_name_with_path_new;
                 $this->logger->info($message);
             }
 
@@ -1155,16 +1191,13 @@ class CommunicationNSIA
             if (null !== $output) {
                 $output->writeln($message);
             }
-        } else {
-            $message = 'ERROR: FTP config not enabled';
-            $this->logger->info($message);
+
+        } catch (\Exception $e) {
+            $message = 'ERROR: Exception occurred while processing files: ' . $e->getMessage();
+            $this->logger->error($message);
             $this->notifyError($message);
-		}
-	}
-
-
-
-
+        }
+    }
 
 
     /**
@@ -1172,8 +1205,8 @@ class CommunicationNSIA
      */
     private function manageFileXmlByType(string $fileType, string $dirPath): array
     {
-$message = 'START manageFileXmlByType';
-$this->logger->info($message);
+        $message = 'START manageFileXmlByType';
+        $this->logger->info($message);
 
 //        $lastRegistryFileAudit = $this->entityManager->getRepository(RegistryFileAudit::class)->findOneBy(
 //            ['type' => $fileType],
@@ -1193,71 +1226,73 @@ $this->logger->info($message);
             $this->formatFieldNumber($newProgressiveNumber, 4),
             date('Ymd')
         );
-$message = '$registryFileAuditType: ' . $fileType . ' - $newProgressiveNumber: ' . $newProgressiveNumber . ' - $filename: ' . $filename;
-$this->logger->info($message);
+        $message = '$registryFileAuditType: ' . $fileType . ' - $newProgressiveNumber: ' . $newProgressiveNumber . ' - $filename: ' . $filename;
+        $this->logger->info($message);
 
-		if (!$this->filesystemMap->has('application_nsia_xml')) {
-            $message = 'ERROR: File system not found (application_nsia_xml)';
-            $this->logger->info($message);
-            $this->notifyError($message);
-		}
+//        if (!$this->filesystemMap->has('application_nsia_xml')) {
+//            $message = 'ERROR: File system not found (application_nsia_xml)';
+//            $this->logger->info($message);
+//            $this->notifyError($message);
+//        }
+//
+//        $fileSystem = $this->filesystemMap->get('application_nsia_xml');
 
-        $fileSystem = $this->filesystemMap->get('application_nsia_xml');
-
-		$this->newProgressiveNumber = $newProgressiveNumber;
+        $this->newProgressiveNumber = $newProgressiveNumber;
 
 //TODO: create tmp file in tmp dir
-		$dir_local_tmp = $this->basePath.'/var/tmp/nsia_tmp/';
-			$filesystemTmp = new Filesystem();
-		    if (!$filesystemTmp->exists($dir_local_tmp)) {
-				$filesystemTmp->mkdir($dir_local_tmp, 0777);
-            }
-
+//        $dir_local_tmp = $this->basePath . '/var/tmp/nsia_tmp/';
+//        $filesystemTmp = new Filesystem();
+//        if (!$filesystemTmp->exists($dir_local_tmp)) {
+//            $filesystemTmp->mkdir($dir_local_tmp, 0777);
+//        }
+//
 //TODO: verificare gestione delete file old
-		$finder = new Finder();
-		$finder->files()->in($dir_local_tmp)->date('until 10 minutes ago');
-		foreach ($finder as $file) {
-			$filesystemTmp->remove($file);
-		}
+//        $finder = new Finder();
+//        $finder->files()->in($dir_local_tmp)->date('until 10 minutes ago');
+//        foreach ($finder as $file) {
+//            $filesystemTmp->remove($file);
+//        }
 
 // genero file xml
-        $fileXml = fopen($dir_local_tmp.$filename, 'w');
-$message = '$fileXml: ' . $fileXml;
-$this->logger->info($message);
+        $fileXml = $filename;
+        $message = '$fileXml: ' . $fileXml;
+        $this->logger->info($message);
 
-        $this->callbackFunctionsManageFileToServer[] = function () use ($fileType, $fileXml, $filename, $newProgressiveNumber, $dirPath, $fileSystem, $dir_local_tmp)  {
-            if(!$this->serverSFTP->file_exists($dirPath)){
-                $this->serverSFTP->mkdir($dirPath);
-            }
-            fclose($fileXml);
+        $this->callbackFunctionsManageFileToServer[] = function () use ($fileType, $fileXml, $filename, $newProgressiveNumber, $dirPath) {
+//            if (!$this->serverSFTP->file_exists($dirPath)) {
+//                $this->serverSFTP->mkdir($dirPath);
+//            }
+//            fclose($fileXml);
 
-            $this->serverSFTP->put($dirPath.$filename, file_get_contents($dir_local_tmp.$filename));
-$message = 'serverSFTP->put: ' . $dirPath.$filename;
-$this->logger->info($message);
+            file_put_contents($dirPath . '/' . $filename, file_get_contents($filename));
+//            $this->serverSFTP->put($dirPath . $filename, file_get_contents($dir_local_tmp . $filename));
+            $message = 'serverSFTP->put: ' . $dirPath . $filename;
+            $this->logger->info($message);
 
             $registryFileAudit = new RegistryFileAudit();
             $registryFileAudit
                 ->setFileName($filename)
                 ->setProgressiveNumber($newProgressiveNumber)
-                ->setType($fileType)
-            ;
+                ->setType($fileType);
             $this->entityManager->persist($registryFileAudit);
 
 //TODO: copio file su dir bkp
-			$fileContent = file_get_contents($dir_local_tmp.$filename);
 
-			$fileSystem->write($dirPath.$filename, $fileContent,true);
-$message = '$fileSystem->write: ' . $dirPath.$filename;
-$this->logger->info($message);
+            $fileContent = file_get_contents($filename);
+
+            file_put_contents($dirPath . '/' . $filename, $fileContent, true);
+//            $fileSystem->write($dirPath . $filename, $fileContent, true);
+            $message = '$fileSystem->write: ' . $dirPath . $filename;
+            $this->logger->info($message);
 //die;
-			unlink($dir_local_tmp.$filename);
+//            unlink($dir_local_tmp . $filename);
 
-$message = 'END manageFileXmlByType';
-$this->logger->info($message);
+            $message = 'END manageFileXmlByType';
+            $this->logger->info($message);
             return $registryFileAudit;
-		}; // end callback
+        }; // end callback
 
-		return ['fileXml' => $fileXml, 'filename' => $filename];
+        return ['fileXml' => $fileXml, 'filename' => $filename];
     }
 
     private function checkArrayFormat(array $array_to_verify, string $field_ctrl)
@@ -1278,16 +1313,17 @@ $this->logger->info($message);
         return $result;
     }
 
-    private function verifyFtpPathByEnv(string $dir) :string {
+    private function verifyFtpPathByEnv(string $dir): string
+    {
         $prefix = '';
         if ($this->ftpEnvironment == 'dev') {
-            $prefix = self::FTP_PATH_PREFIX . '_' . $this->ftpEnvironment.'_';
+            $prefix = self::FTP_PATH_PREFIX . '_' . $this->ftpEnvironment . '_';
         } elseif ($this->ftpEnvironment == 'test') {
             $prefix = self::FTP_PATH_PREFIX . '/' . $this->ftpEnvironment . '_';
         } elseif ($this->ftpEnvironment == 'prod') {
             $prefix = self::FTP_PATH_PREFIX . '/';
         } else {
-            $message = 'ERROR invalid ftpEnvironment ('.$this->ftpEnvironment.')';
+            $message = 'ERROR invalid ftpEnvironment (' . $this->ftpEnvironment . ')';
             $this->logger->info($message);
             $this->notifyError($message);
         }
