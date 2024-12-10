@@ -18,7 +18,7 @@ spec:
 
       containers:
       - name: gal-fe
-        image: io.iad2.cloud/artigiancassa/gal-fe:0.0.6
+        image: sdg-registry.dev.echonet/agevolarti/liguria-gal-nginx:v2
         resources:
           requests:
             memory: "128Mi"
