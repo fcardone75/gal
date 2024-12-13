@@ -1,0 +1,18 @@
+FROM sdg-registry.dev.echonet/woodby-nginx:1.21
+
+USER root
+
+COPY .config/nginx-entrypoint.sh /nginx-entrypoint.sh
+RUN chmod +x /nginx-entrypoint.sh   
+RUN sed -i 's|80 default_server|8080 default_server|g' /etc/gotpl/vhost.conf.tmpl
+RUN sed -i 's|listen       80;|listen       8080;|g' /etc/nginx/nginx.conf
+RUN sed -i 's|listen       80;|listen       8080;|g' /etc/nginx/nginx.conf.default
+RUN cp -R /etc/nginx /etc/nginx-orig
+RUN gotpl "/etc/gotpl/50x.html.tmpl" "/usr/share/nginx/html/50x.html"
+RUN chown -R wodby:wodby /var/cache/nginx /usr/share/nginx/ /var/run/nginx /nginx-entrypoint.sh /etc/nginx/ /etc/nginx-orig
+USER wodby
+WORKDIR /var/www/html
+COPY . .
+ENTRYPOINT ["/bin/bash", "/nginx-entrypoint.sh"]
+CMD ["nginx"]
+EXPOSE  8080
